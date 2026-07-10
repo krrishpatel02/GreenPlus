@@ -1,0 +1,141 @@
+/* Navbar */
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 18px 8%;
+
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+/* Logo */
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    font-size:1.6rem;
+    font-weight:700;
+    color:#1fa84f;
+    cursor:pointer;
+}
+
+.logo-icon{
+    font-size:1.8rem;
+    transition:.4s;
+}
+
+.logo:hover .logo-icon{
+    transform:rotate(-15deg) scale(1.15);
+}
+
+/* Links */
+
+.nav-links{
+    display:flex;
+    gap:35px;
+    list-style:none;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:#222;
+    font-weight:500;
+    transition:.3s;
+    position:relative;
+}
+
+.nav-links a::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:-5px;
+
+    width:0%;
+    height:2px;
+    background:#22c55e;
+    transition:.35s;
+}
+
+.nav-links a:hover{
+    color:#22c55e;
+}
+
+.nav-links a:hover::after{
+    width:100%;
+}
+
+/* Buttons */
+
+.nav-buttons{
+    display:flex;
+    gap:15px;
+}
+
+.login-btn,
+.start-btn{
+    padding:10px 22px;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
+    font-size:.95rem;
+    transition:.35s;
+}
+
+.login-btn{
+    background:white;
+    color:#22c55e;
+    border:2px solid #22c55e;
+}
+
+.login-btn:hover{
+    background:#22c55e;
+    color:white;
+    transform:translateY(-2px);
+}
+
+.start-btn{
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    color:white;
+    box-shadow:0 10px 20px rgba(34,197,94,.3);
+}
+
+.start-btn:hover{
+    transform:translateY(-3px) scale(1.05);
+    box-shadow:0 15px 30px rgba(34,197,94,.45);
+}
+
+/* Mobile Icon */
+
+.menu-icon{
+    display:none;
+    font-size:1.5rem;
+    cursor:pointer;
+    color:#22c55e;
+}
+
+/* Responsive */
+
+@media(max-width:900px){
+
+.nav-links,
+.nav-buttons{
+    display:none;
+}
+
+.menu-icon{
+    display:block;
+}
+
+}

@@ -1,10 +1,12 @@
+import React from "react";
+import { EcoProvider } from "./context/EcoContext";
+import AppRoutes from "./routes/AppRoutes";
+
 function App() {
   return (
-    <div className="App">
-      <h1 className="text-3xl font-bold underline">
-        Greenplus
-      </h1>
-    </div>
+    <EcoProvider>
+      <AppRoutes />
+    </EcoProvider>
   );
 }
 
