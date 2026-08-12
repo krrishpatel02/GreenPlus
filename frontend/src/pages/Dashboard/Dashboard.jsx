@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
 import TeslaChart from "../../componentes/ui/TeslaChart";
 import Mascot from "../../componentes/common/Mascot";
@@ -42,8 +43,12 @@ const Dashboard = () => {
     setLevelUpMessage,
   } = useEco();
 
-  // Notion Layout state
-  const [activeTab, setActiveTab] = useState("overview"); // overview, energy, water, learning, schemes
+  // URL state hook for tab routing (Notion style)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "overview";
+  const setActiveTab = (tab) => setSearchParams({ tab });
+
+  // Sidebar Layout State
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Form Inputs
@@ -54,19 +59,6 @@ const Dashboard = () => {
   // Water Quick Log Feedback state
   const [waterFeedback, setWaterFeedback] = useState("");
 
-  // Quiz State
-  const [activeQuiz, setActiveQuiz] = useState(null); // quiz object
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [quizAnswered, setQuizAnswered] = useState(false);
-  const [quizScore, setQuizScore] = useState(0);
-  const [quizStep, setQuizStep] = useState("intro"); // intro, questions, summary
-
-  // Schemes State
-  const [schemeSearch, setSchemeSearch] = useState("");
-  const [schemeCategoryFilter, setSchemeCategoryFilter] = useState("All");
-  const [selectedSchemeDetail, setSelectedSchemeDetail] = useState(null);
-
   // AI Chatbot State
   const [chatMessages, setChatMessages] = useState([
     { sender: "leafy", text: "Hey! I am Leafy, your AI Eco Assistant. Ask me anything about saving energy, water, composting, or green rebates! 🤖🌿" }
@@ -74,36 +66,42 @@ const Dashboard = () => {
   const [chatInput, setChatInput] = useState("");
   const [isChatThinking, setIsChatThinking] = useState(false);
 
-  const handleSendChatMessage = (text) => {
-    if (!text.trim()) return;
+  // DOM ref for auto-scrolling chat
+  const messagesEndRef = useRef(null);
 
-    const userMessage = { sender: "user", text };
-    setChatMessages((prev) => [...prev, userMessage]);
-    setChatInput("");
-    setIsChatThinking(true);
+  // Scroll to bottom of chat when new messages arrive
+  useEffect(() => {
+    if (activeTab === "ai") {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, isChatThinking, activeTab]);
 
-    setTimeout(() => {
-      const query = text.toLowerCase();
-      let replyText = "";
+  // Quiz State
+  const [activeQuiz, setActiveQuiz] = useState(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [quizAnswered, setQuizAnswered] = useState(false);
+  const [quizScore, setQuizScore] = useState(0);
+  const [quizStep, setQuizStep] = useState("intro"); // intro, questions, summary
 
-      if (query.includes("solar") || query.includes("panel") || query.includes("electric") || query.includes("energy") || query.includes("net metering") || query.includes("power")) {
-        replyText = "Solar energy is a game-changer! You can generate your own power, save on utility bills, and get up to 30% tax credits (check our Green Schemes tab). I recommend starting with the Solar Basics quiz in the Learning Center to earn 50 XP! ⚡☀️";
-      } else if (query.includes("water") || query.includes("greywater") || query.includes("rainwater") || query.includes("shower") || query.includes("save")) {
-        replyText = "Conserving water is vital. Quick tips: restrict shower times to 5 minutes (saves ~40L), reuse kitchen rinse water for backyard soil, and check if your local utility offers rainwater tank subsidies. Log your savings today to gain XP! 💧🏺";
-      } else if (query.includes("compost") || query.includes("recycle") || query.includes("waste") || query.includes("garbage") || query.includes("food")) {
-        replyText = "Compost turns food scraps into earth gold! Avoid composting meat, dairy, or oily foods as they attract pests. Instead, stick to fruit peels, coffee grounds, eggshells, and dry leaves. You will save waste from landfill methane! 🪱🍂";
-      } else if (query.includes("rebate") || query.includes("scheme") || query.includes("incentive") || query.includes("credit") || query.includes("grant") || query.includes("tax")) {
-        replyText = "Excellent! Governments offer massive incentives for going green: up to $7,500 for electric vehicles, 30% tax credits for home solar, and $500 for home EV charger setups. Click on our **Green Schemes** database tab! 🏛️💰";
-      } else {
-        replyText = "That is a great question! Living sustainably is a journey of small daily habits. Try completing today's eco-checklist, or ask me about 'Solar energy', 'Water saving', or 'Composting tips'! 🌿";
-      }
+  // Schemes Filter State
+  const [schemeSearch, setSchemeSearch] = useState("");
+  const [schemeCategoryFilter, setSchemeCategoryFilter] = useState("All");
+  const [selectedSchemeDetail, setSelectedSchemeDetail] = useState(null);
 
-      setChatMessages((prev) => [...prev, { sender: "leafy", text: replyText }]);
-      setIsChatThinking(false);
-    }, 1000);
-  };
+  // useMemo hook to cache and filter schemes list (Notion database optimization)
+  const filteredSchemes = useMemo(() => {
+    return DEFAULT_SCHEMES.filter((sch) => {
+      const matchSearch =
+        sch.title.toLowerCase().includes(schemeSearch.toLowerCase()) ||
+        sch.desc.toLowerCase().includes(schemeSearch.toLowerCase());
+      const matchCat =
+        schemeCategoryFilter === "All" || sch.category === schemeCategoryFilter;
+      return matchSearch && matchCat;
+    });
+  }, [DEFAULT_SCHEMES, schemeSearch, schemeCategoryFilter]);
 
-  // Handler helpers
+  // Handlers
   const handleLogEnergySubmit = (e) => {
     e.preventDefault();
     const grid = parseFloat(gridEnergyInput);
@@ -148,92 +146,151 @@ const Dashboard = () => {
     if (currentQuestionIndex < activeQuiz.questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
-      // Calculate final score percentage
       const finalScorePct = (quizScore / activeQuiz.questions.length) * 100;
       completeQuiz(activeQuiz.id, finalScorePct);
       setQuizStep("summary");
     }
   };
 
+  const handleSendChatMessage = (text) => {
+    if (!text.trim()) return;
+
+    const userMessage = { sender: "user", text };
+    setChatMessages((prev) => [...prev, userMessage]);
+    setChatInput("");
+    setIsChatThinking(true);
+
+    setTimeout(() => {
+      const query = text.toLowerCase();
+      let replyText = "";
+
+      if (
+        query.includes("solar") ||
+        query.includes("panel") ||
+        query.includes("electric") ||
+        query.includes("energy") ||
+        query.includes("net metering") ||
+        query.includes("power")
+      ) {
+        replyText =
+          "Solar energy is a game-changer! You can generate your own power, save on utility bills, and get up to 30% tax credits (check our Green Schemes tab). I recommend starting with the Solar Basics quiz in the Learning Center to earn 50 XP! ⚡☀️";
+      } else if (
+        query.includes("water") ||
+        query.includes("greywater") ||
+        query.includes("rainwater") ||
+        query.includes("shower") ||
+        query.includes("save")
+      ) {
+        replyText =
+          "Conserving water is vital. Quick tips: restrict shower times to 5 minutes (saves ~40L), reuse kitchen rinse water for backyard soil, and check if your local utility offers rainwater tank subsidies. Log your savings today to gain XP! 💧🏺";
+      } else if (
+        query.includes("compost") ||
+        query.includes("recycle") ||
+        query.includes("waste") ||
+        query.includes("garbage") ||
+        query.includes("food")
+      ) {
+        replyText =
+          "Compost turns food scraps into earth gold! Avoid composting meat, dairy, or oily foods as they attract pests. Instead, stick to fruit peels, coffee grounds, eggshells, and dry leaves. You will save waste from landfill methane! 🪱🍂";
+      } else if (
+        query.includes("rebate") ||
+        query.includes("scheme") ||
+        query.includes("incentive") ||
+        query.includes("credit") ||
+        query.includes("grant") ||
+        query.includes("tax")
+      ) {
+        replyText =
+          "Excellent! Governments offer massive incentives for going green: up to $7,500 for electric vehicles, 30% tax credits for home solar, and $500 for home EV charger setups. Click on our **Green Schemes** database tab! 🏛️💰";
+      } else {
+        replyText =
+          "That is a great question! Living sustainably is a journey of small daily habits. Try completing today's eco-checklist, or ask me about 'Solar energy', 'Water saving', or 'Composting tips'! 🌿";
+      }
+
+      setChatMessages((prev) => [...prev, { sender: "leafy", text: replyText }]);
+      setIsChatThinking(false);
+    }, 1000);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex font-sans pt-16">
-      {/* Notion-style Left Sidebar */}
+    <div className="min-h-screen bg-slate-50/50 flex font-sans pt-16">
+      {/* Notion-style Left Sidebar (Charcoal gray matching Tesla / Notion aesthetics) */}
       <motion.aside
         animate={{ width: sidebarOpen ? 260 : 0 }}
-        className="bg-gray-950 text-gray-300 border-r border-gray-900 overflow-hidden flex flex-col shrink-0 z-40"
+        className="bg-slate-900 text-slate-300 border-r border-slate-800 overflow-hidden flex flex-col shrink-0 z-40"
       >
-        <div className="p-5 border-b border-gray-900 flex items-center justify-between">
+        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">🌿</span>
-            <span className="font-extrabold text-white text-sm tracking-wide">GreenPlus Space</span>
+            <span className="font-extrabold text-white text-sm tracking-wide font-sans">GreenPlus Space</span>
           </div>
-          <span className="text-[10px] bg-gray-800 text-gray-400 font-bold px-2 py-0.5 rounded">Notion v1.2</span>
+          <span className="text-[10px] bg-slate-800 text-slate-400 font-bold px-2 py-0.5 rounded">Notion v1.2</span>
         </div>
 
         <nav className="flex-1 p-3 space-y-1">
-          <div className="text-[10px] uppercase font-bold text-gray-500 px-3 mb-2 tracking-wider">WORKSPACE</div>
+          <div className="text-[10px] uppercase font-bold text-slate-500 px-3 mb-2 tracking-wider">WORKSPACE</div>
           <button
             onClick={() => setActiveTab("overview")}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition ${
-              activeTab === "overview" ? "bg-gray-800 text-white" : "hover:bg-gray-900 text-gray-400"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+              activeTab === "overview" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
             <span>📊</span> Overview
           </button>
           <button
             onClick={() => setActiveTab("energy")}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition ${
-              activeTab === "energy" ? "bg-gray-800 text-white" : "hover:bg-gray-900 text-gray-400"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+              activeTab === "energy" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
             <span>⚡</span> Energy Tracker
           </button>
           <button
             onClick={() => setActiveTab("water")}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition ${
-              activeTab === "water" ? "bg-gray-800 text-white" : "hover:bg-gray-900 text-gray-400"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+              activeTab === "water" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
             <span>💧</span> Water Tracker
           </button>
           <button
             onClick={() => setActiveTab("learning")}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition ${
-              activeTab === "learning" ? "bg-gray-800 text-white" : "hover:bg-gray-900 text-gray-400"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+              activeTab === "learning" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
             <span>🎓</span> Learning Center
           </button>
           <button
             onClick={() => setActiveTab("schemes")}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition ${
-              activeTab === "schemes" ? "bg-gray-800 text-white" : "hover:bg-gray-900 text-gray-400"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+              activeTab === "schemes" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
             <span>🏛️</span> Green Schemes
           </button>
           <button
             onClick={() => setActiveTab("ai")}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition ${
-              activeTab === "ai" ? "bg-gray-800 text-white" : "hover:bg-gray-900 text-gray-400"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+              activeTab === "ai" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
             <span>🤖</span> AI Assistant
           </button>
           <button
             onClick={() => setActiveTab("leaderboard")}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition ${
-              activeTab === "leaderboard" ? "bg-gray-800 text-white" : "hover:bg-gray-900 text-gray-400"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+              activeTab === "leaderboard" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
             <span>🏆</span> Leaderboard
           </button>
         </nav>
 
-        <div className="p-4 border-t border-gray-900 bg-gray-950/60">
+        <div className="p-4 border-t border-slate-800 bg-slate-900/60">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-            <span className="text-xs text-gray-500 font-semibold uppercase">Cloud Synced</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Cloud Synced</span>
           </div>
         </div>
       </motion.aside>
@@ -244,15 +301,17 @@ const Dashboard = () => {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-gray-500 hover:text-gray-900 bg-white border border-gray-100 rounded-xl hover:shadow-sm transition cursor-pointer"
+            className="p-2 text-slate-500 hover:text-slate-950 bg-white border border-slate-100 rounded-xl hover:shadow-sm transition cursor-pointer"
           >
             <FaBars />
           </button>
-          <div className="flex items-center gap-2 text-sm text-gray-400 font-semibold font-sans">
+          <div className="flex items-center gap-2 text-sm text-slate-400 font-semibold font-sans">
             <FaFolder />
             <span>GreenPlus Workspace</span>
             <FaAngleRight className="text-xs" />
-            <span className="text-gray-900 capitalize">{activeTab}</span>
+            <span className="text-slate-800 font-bold capitalize">
+              {activeTab === "ai" ? "AI Assistant" : activeTab}
+            </span>
           </div>
         </div>
 
@@ -263,18 +322,18 @@ const Dashboard = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-emerald-500 text-white p-5 rounded-3xl mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-[0_4px_12px_rgba(16,185,129,0.3)]"
+              className="bg-gradient-to-r from-emerald-500 to-teal-400 text-white p-5 rounded-3xl mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-[0_8px_20px_rgba(16,185,129,0.25)] border border-emerald-400/20"
             >
               <div className="flex items-center gap-4">
                 <span className="text-3xl">🎉</span>
                 <div>
-                  <h4 className="font-extrabold text-lg">Level Up!</h4>
+                  <h4 className="font-extrabold text-lg font-sans">Level Up!</h4>
                   <p className="text-sm opacity-90">{levelUpMessage}</p>
                 </div>
               </div>
               <button
                 onClick={() => setLevelUpMessage(null)}
-                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-xs font-bold rounded-xl transition cursor-pointer"
+                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-xs font-bold rounded-2xl transition cursor-pointer shadow-sm"
               >
                 Awesome!
               </button>
@@ -284,28 +343,28 @@ const Dashboard = () => {
 
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === "overview" && (
-          <div className="space-y-8">
+          <div className="space-y-8 animate-fadeIn">
             {/* Gamification Stats: Streak & Level Card (Duolingo Style) */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-8">
               <div className="flex flex-col sm:flex-row items-center gap-6">
                 {/* Visual streak fire */}
-                <div className="relative w-20 h-20 bg-amber-50 rounded-full border border-amber-100 flex items-center justify-center text-4xl shadow-sm">
+                <div className="relative w-20 h-20 bg-amber-50 rounded-full border border-amber-100 flex items-center justify-center text-4xl shadow-inner">
                   <FaFire className="text-amber-500 animate-bounce" />
-                  <span className="absolute bottom-[-5px] right-[-5px] bg-amber-500 text-white font-extrabold text-xs px-2 py-0.5 rounded-full">
+                  <span className="absolute bottom-[-5px] right-[-5px] bg-amber-500 text-white font-extrabold text-xs px-2.5 py-0.5 rounded-full shadow">
                     {user.streak}d
                   </span>
                 </div>
 
                 <div className="text-center sm:text-left">
-                  <h2 className="text-2xl font-extrabold text-gray-900">Your Current Streak: {user.streak} Days!</h2>
-                  <p className="text-gray-400 text-sm mt-1">Log carbon metrics daily to grow your leaf and level up.</p>
+                  <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Your Current Streak: {user.streak} Days!</h2>
+                  <p className="text-slate-400 text-sm mt-1">Log carbon metrics daily to grow your leaf and level up.</p>
                   
                   <button
                     disabled={user.streakClaimed}
                     onClick={claimStreakBonus}
-                    className={`mt-4 px-6 py-2.5 font-bold rounded-2xl shadow-sm text-sm transition ${
+                    className={`mt-4 px-6 py-3 font-bold rounded-2xl text-sm transition-all ${
                       user.streakClaimed
-                        ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
+                        ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
                         : "bg-amber-500 hover:bg-amber-400 text-white shadow-[0_4px_0_0_#d97706] active:translate-y-1 active:shadow-none cursor-pointer"
                     }`}
                   >
@@ -315,18 +374,18 @@ const Dashboard = () => {
               </div>
 
               {/* Progress bar of current level */}
-              <div className="w-full md:w-[300px] bg-gray-50 border border-gray-100 rounded-2xl p-4">
-                <div className="flex justify-between items-center text-xs font-bold text-gray-600 mb-2">
+              <div className="w-full md:w-[320px] bg-slate-50 border border-slate-100 rounded-2xl p-5 shadow-sm">
+                <div className="flex justify-between items-center text-xs font-extrabold text-slate-600 mb-2">
                   <span className="flex items-center gap-1">⭐ Level {user.level}</span>
                   <span>{user.xp} / {user.xpToNextLevel} XP</span>
                 </div>
-                <div className="w-full bg-gray-200 h-2.5 rounded-full overflow-hidden mb-2">
+                <div className="w-full bg-slate-200 h-3 rounded-full overflow-hidden mb-2">
                   <div
-                    className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                    className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
                     style={{ width: `${(user.xp / user.xpToNextLevel) * 100}%` }}
                   ></div>
                 </div>
-                <span className="text-[10px] text-gray-400 block text-right font-medium">
+                <span className="text-[10px] text-slate-400 block text-right font-semibold">
                   {user.xpToNextLevel - user.xp} XP remaining to Level {user.level + 1}
                 </span>
               </div>
@@ -335,8 +394,8 @@ const Dashboard = () => {
             {/* Main Overview Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Left Column: Daily Checklist */}
-              <div className="lg:col-span-7 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <span>📅</span> Daily Eco-Checklist
                 </h3>
                 <div className="space-y-3">
@@ -345,24 +404,24 @@ const Dashboard = () => {
                       key={task.id}
                       onClick={() => {
                         if (task.id === "log_energy") setActiveTab("energy");
-                        if (task.id === "log_water") setActiveTab("overview"); // water logger is inside overview & water tab
+                        if (task.id === "log_water") setActiveTab("overview");
                         if (task.id === "quiz") setActiveTab("learning");
                       }}
                       className={`p-4 rounded-2xl border transition flex items-center justify-between cursor-pointer ${
                         task.completed
-                          ? "bg-emerald-50/20 border-emerald-100 text-gray-400 line-through"
-                          : "bg-white border-gray-100 hover:border-emerald-200 text-gray-800"
+                          ? "bg-emerald-50/30 border-emerald-100 text-slate-400 line-through"
+                          : "bg-white border-slate-100 hover:border-emerald-200 text-slate-800 hover:bg-slate-50/30"
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         {task.completed ? (
                           <FaCheckCircle className="text-emerald-500 text-lg" />
                         ) : (
-                          <FaRegCircle className="text-gray-300 text-lg" />
+                          <FaRegCircle className="text-slate-300 text-lg" />
                         )}
                         <span className="font-semibold text-sm">{task.text}</span>
                       </div>
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded ${task.completed ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-600"}`}>
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded ${task.completed ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-600"}`}>
                         +{task.xp} XP
                       </span>
                     </div>
@@ -371,7 +430,7 @@ const Dashboard = () => {
               </div>
 
               {/* Right Column: Mascot Greeting Box */}
-              <div className="lg:col-span-5 bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col items-center justify-center text-center">
+              <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col items-center justify-center text-center">
                 <Mascot
                   mood={user.streakClaimed ? "celebrate" : "happy"}
                   outfit={user.leafyOutfit}
@@ -384,7 +443,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Quick Water Logging Panel (Integrated inside overview for frictionless tracking) */}
+            {/* Quick Water Logging Panel */}
             <div className="bg-blue-50/40 border border-blue-100 rounded-3xl p-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>
@@ -403,26 +462,26 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <button
                   onClick={() => handleWaterQuickLog(120, 40, "Shorter Shower")}
-                  className="p-4 bg-white hover:bg-blue-50/30 border border-blue-100 hover:border-blue-300 rounded-2xl text-left shadow-[0_3px_0_0_#93c5fd] hover:shadow-none hover:translate-y-0.5 active:translate-y-1 transition-all cursor-pointer"
+                  className="p-5 bg-white hover:bg-blue-50/10 border border-blue-100 hover:border-blue-300 rounded-2xl text-left shadow-[0_4px_0_0_#93c5fd] hover:shadow-none hover:translate-y-0.5 active:translate-y-1 transition-all cursor-pointer"
                 >
                   <span className="text-2xl block mb-2">🚿</span>
-                  <span className="font-bold text-sm text-gray-900 block">Shorter Shower</span>
+                  <span className="font-bold text-sm text-slate-900 block">Shorter Shower</span>
                   <span className="text-[10px] text-blue-600 font-bold mt-1 block">Saved 40 Liters</span>
                 </button>
                 <button
                   onClick={() => handleWaterQuickLog(100, 25, "Eco Wash Mode")}
-                  className="p-4 bg-white hover:bg-blue-50/30 border border-blue-100 hover:border-blue-300 rounded-2xl text-left shadow-[0_3px_0_0_#93c5fd] hover:shadow-none hover:translate-y-0.5 active:translate-y-1 transition-all cursor-pointer"
+                  className="p-5 bg-white hover:bg-blue-50/10 border border-blue-100 hover:border-blue-300 rounded-2xl text-left shadow-[0_4px_0_0_#93c5fd] hover:shadow-none hover:translate-y-0.5 active:translate-y-1 transition-all cursor-pointer"
                 >
                   <span className="text-2xl block mb-2">🧺</span>
-                  <span className="font-bold text-sm text-gray-900 block">Eco Washing Machine</span>
+                  <span className="font-bold text-sm text-slate-900 block">Eco Washing Machine</span>
                   <span className="text-[10px] text-blue-600 font-bold mt-1 block">Saved 25 Liters</span>
                 </button>
                 <button
                   onClick={() => handleWaterQuickLog(60, 50, "Rainwater Collection")}
-                  className="p-4 bg-white hover:bg-blue-50/30 border border-blue-100 hover:border-blue-300 rounded-2xl text-left shadow-[0_3px_0_0_#93c5fd] hover:shadow-none hover:translate-y-0.5 active:translate-y-1 transition-all cursor-pointer"
+                  className="p-5 bg-white hover:bg-blue-50/10 border border-blue-100 hover:border-blue-300 rounded-2xl text-left shadow-[0_4px_0_0_#93c5fd] hover:shadow-none hover:translate-y-0.5 active:translate-y-1 transition-all cursor-pointer"
                 >
                   <span className="text-2xl block mb-2">🌧️</span>
-                  <span className="font-bold text-sm text-gray-900 block">Harvest Rainwater</span>
+                  <span className="font-bold text-sm text-slate-900 block">Harvest Rainwater</span>
                   <span className="text-[10px] text-blue-600 font-bold mt-1 block">Saved 50 Liters</span>
                 </button>
               </div>
@@ -432,26 +491,26 @@ const Dashboard = () => {
 
         {/* ==================== ENERGY TRACKER TAB ==================== */}
         {activeTab === "energy" && (
-          <div className="space-y-8">
+          <div className="space-y-8 animate-fadeIn">
+            {/* Tesla dark mode cockpit colors */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Tesla Metric Cards */}
-              <div className="bg-gray-900 text-white rounded-2xl p-6 border border-gray-800 shadow flex flex-col justify-between h-[140px]">
-                <span className="text-xs uppercase font-extrabold tracking-wider text-gray-500">Cumulative CO₂ Offsets</span>
+              <div className="bg-slate-950 text-white rounded-2xl p-6 border border-slate-800 shadow-md flex flex-col justify-between h-[140px]">
+                <span className="text-xs uppercase font-extrabold tracking-wider text-slate-500">Cumulative CO₂ Offsets</span>
                 <span className="text-3xl font-extrabold text-emerald-400 font-mono">
                   {energyLogs.reduce((acc, curr) => acc + curr.offset, 0).toFixed(1)} kg
                 </span>
                 <span className="text-[10px] text-emerald-500 font-bold">Equivalent to planting {Math.round(energyLogs.reduce((acc, curr) => acc + curr.offset, 0) / 10)} trees!</span>
               </div>
-              <div className="bg-gray-900 text-white rounded-2xl p-6 border border-gray-800 shadow flex flex-col justify-between h-[140px]">
-                <span className="text-xs uppercase font-extrabold tracking-wider text-gray-500">Average Solar Output</span>
+              <div className="bg-slate-950 text-white rounded-2xl p-6 border border-slate-800 shadow-md flex flex-col justify-between h-[140px]">
+                <span className="text-xs uppercase font-extrabold tracking-wider text-slate-500">Average Solar Output</span>
                 <span className="text-3xl font-extrabold text-emerald-400 font-mono">
                   {energyLogs.length ? (energyLogs.reduce((acc, curr) => acc + curr.solarEnergy, 0) / energyLogs.length).toFixed(1) : 0} kWh
                 </span>
-                <span className="text-[10px] text-gray-400 font-bold">Self-generated clean electricity</span>
+                <span className="text-[10px] text-slate-400 font-bold font-sans">Self-generated clean electricity</span>
               </div>
-              <div className="bg-gray-900 text-white rounded-2xl p-6 border border-gray-800 shadow flex flex-col justify-between h-[140px]">
-                <span className="text-xs uppercase font-extrabold tracking-wider text-gray-500">Grid Reliance Ratio</span>
-                <span className="text-3xl font-extrabold text-amber-500 font-mono">
+              <div className="bg-slate-950 text-white rounded-2xl p-6 border border-slate-800 shadow-md flex flex-col justify-between h-[140px]">
+                <span className="text-xs uppercase font-extrabold tracking-wider text-slate-500">Grid Reliance Ratio</span>
+                <span className="text-3xl font-extrabold text-amber-400 font-mono font-sans">
                   {energyLogs.length
                     ? Math.round(
                         (energyLogs.reduce((acc, curr) => acc + curr.gridEnergy, 0) /
@@ -474,13 +533,13 @@ const Dashboard = () => {
             {/* Input logger & simulator */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Form Input */}
-              <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-1.5">
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-1.5">
                   <FaBolt className="text-amber-500" /> Log Daily Utility Usage
                 </h3>
                 <form onSubmit={handleLogEnergySubmit} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">Grid Consumption (kWh)</label>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5">Grid Consumption (kWh)</label>
                     <input
                       type="number"
                       step="0.1"
@@ -488,11 +547,11 @@ const Dashboard = () => {
                       value={gridEnergyInput}
                       onChange={(e) => setGridEnergyInput(e.target.value)}
                       placeholder="e.g. 12.5"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-gray-800"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">Solar Generation (kWh)</label>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5">Solar Generation (kWh)</label>
                     <input
                       type="number"
                       step="0.1"
@@ -500,12 +559,12 @@ const Dashboard = () => {
                       value={solarEnergyInput}
                       onChange={(e) => setSolarEnergyInput(e.target.value)}
                       placeholder="e.g. 5.8 (Input 0 if no solar)"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-gray-800"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl shadow-[0_3px_0_0_#059669] active:translate-y-1 active:shadow-none transition-all cursor-pointer"
+                    className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl shadow-[0_4px_0_0_#059669] active:translate-y-1 active:shadow-none transition-all cursor-pointer text-center font-sans tracking-wide"
                   >
                     Log Usage Stats
                   </button>
@@ -513,18 +572,18 @@ const Dashboard = () => {
               </div>
 
               {/* Tesla Simulator */}
-              <div className="bg-gray-950 text-white rounded-3xl border border-gray-900 p-6 flex flex-col justify-between">
+              <div className="bg-slate-950 text-white rounded-3xl border border-slate-800 p-6 flex flex-col justify-between">
                 <div>
                   <h3 className="text-lg font-bold flex items-center gap-1.5 text-white">
                     <span>⚡</span> Smart Solar Offset Simulator
                   </h3>
-                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                     Slide to simulate upgrading your house with solar panels. See how increasing solar offset cuts down your reliance on carbon-heavy municipal energy.
                   </p>
                 </div>
 
                 <div className="my-6">
-                  <div className="flex justify-between items-center text-xs font-bold text-gray-400 mb-2">
+                  <div className="flex justify-between items-center text-xs font-extrabold text-slate-400 mb-2">
                     <span>Solar Capacity Ratio</span>
                     <span className="text-emerald-400 text-sm font-extrabold">{solarSimulationPct}%</span>
                   </div>
@@ -534,17 +593,17 @@ const Dashboard = () => {
                     max="100"
                     value={solarSimulationPct}
                     onChange={(e) => setSolarSimulationPct(e.target.value)}
-                    className="w-full accent-emerald-500 cursor-pointer h-1.5 bg-gray-800 rounded-lg appearance-none"
+                    className="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg appearance-none"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 border-t border-gray-900 pt-4 text-center">
+                <div className="grid grid-cols-2 gap-4 border-t border-slate-900 pt-4 text-center">
                   <div>
-                    <span className="text-[10px] text-gray-500 block uppercase font-bold">Estimated Monthly Savings</span>
+                    <span className="text-[10px] text-slate-500 block uppercase font-extrabold">Estimated Monthly Savings</span>
                     <span className="text-lg font-extrabold text-white font-mono">${Math.round(solarSimulationPct * 1.8)}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-gray-500 block uppercase font-bold">Annual Carbon Avoided</span>
+                    <span className="text-[10px] text-slate-500 block uppercase font-extrabold">Annual Carbon Avoided</span>
                     <span className="text-lg font-extrabold text-emerald-400 font-mono">
                       {Math.round(solarSimulationPct * 14.5)} kg
                     </span>
@@ -557,10 +616,10 @@ const Dashboard = () => {
 
         {/* ==================== WATER TRACKER TAB ==================== */}
         {activeTab === "water" && (
-          <div className="space-y-8">
+          <div className="space-y-8 animate-fadeIn">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Metrics */}
-              <div className="bg-blue-900/10 border border-blue-200/50 rounded-2xl p-6 flex items-center justify-between">
+              <div className="bg-blue-50/40 border border-blue-100 rounded-2xl p-6 flex items-center justify-between">
                 <div>
                   <span className="text-xs text-blue-700 font-bold uppercase tracking-wider block">Total Water Tracked</span>
                   <span className="text-3xl font-extrabold text-blue-950 font-mono">
@@ -570,7 +629,7 @@ const Dashboard = () => {
                 </div>
                 <span className="text-4xl">💧</span>
               </div>
-              <div className="bg-emerald-900/10 border border-emerald-200/50 rounded-2xl p-6 flex items-center justify-between">
+              <div className="bg-emerald-50/30 border border-emerald-100 rounded-2xl p-6 flex items-center justify-between">
                 <div>
                   <span className="text-xs text-emerald-700 font-bold uppercase tracking-wider block">Water Conserved</span>
                   <span className="text-3xl font-extrabold text-emerald-950 font-mono">
@@ -588,12 +647,12 @@ const Dashboard = () => {
             </div>
 
             {/* Quick logger list */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-1.5">
+                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-1.5">
                   <FaTint className="text-blue-500 animate-pulse" /> Hydration & Savings Logger
                 </h3>
-                <p className="text-sm text-gray-500 mt-1">Tap a card to register daily actions. Keep your water budget clean!</p>
+                <p className="text-sm text-slate-500 mt-1">Tap a card to register daily actions. Keep your water budget clean!</p>
               </div>
 
               {waterFeedback && (
@@ -603,43 +662,43 @@ const Dashboard = () => {
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-5 border border-gray-100 rounded-2xl text-center space-y-4 hover:shadow-sm transition">
+                <div className="p-5 border border-slate-100 rounded-2xl text-center space-y-4 hover:shadow-sm transition">
                   <span className="text-4xl block">🚿</span>
                   <div>
-                    <span className="font-bold text-gray-900 text-sm block">Eco-Shower</span>
-                    <span className="text-xs text-gray-400 block mt-1">Restrict bathing to under 5 minutes to reduce waste.</span>
+                    <span className="font-bold text-slate-900 text-sm block">Eco-Shower</span>
+                    <span className="text-xs text-slate-400 block mt-1">Restrict bathing to under 5 minutes to reduce waste.</span>
                   </div>
                   <button
                     onClick={() => handleWaterQuickLog(35, 45, "5-Min Shower")}
-                    className="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl border border-blue-200 transition cursor-pointer"
+                    className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl border border-blue-200 transition cursor-pointer"
                   >
                     Log Activity (+45L Saved)
                   </button>
                 </div>
 
-                <div className="p-5 border border-gray-100 rounded-2xl text-center space-y-4 hover:shadow-sm transition">
+                <div className="p-5 border border-slate-100 rounded-2xl text-center space-y-4 hover:shadow-sm transition">
                   <span className="text-4xl block">🍽️</span>
                   <div>
-                    <span className="font-bold text-gray-900 text-sm block">Full Load Dishwasher</span>
-                    <span className="text-xs text-gray-400 block mt-1">Wait for full capacity before running dish cycles.</span>
+                    <span className="font-bold text-slate-900 text-sm block">Full Load Dishwasher</span>
+                    <span className="text-xs text-slate-400 block mt-1">Wait for full capacity before running dish cycles.</span>
                   </div>
                   <button
                     onClick={() => handleWaterQuickLog(12, 15, "Full Load Dishwasher")}
-                    className="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl border border-blue-200 transition cursor-pointer"
+                    className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl border border-blue-200 transition cursor-pointer"
                   >
                     Log Activity (+15L Saved)
                   </button>
                 </div>
 
-                <div className="p-5 border border-gray-100 rounded-2xl text-center space-y-4 hover:shadow-sm transition">
+                <div className="p-5 border border-slate-100 rounded-2xl text-center space-y-4 hover:shadow-sm transition">
                   <span className="text-4xl block">🏺</span>
                   <div>
-                    <span className="font-bold text-gray-900 text-sm block">Greywater Recycling</span>
-                    <span className="text-xs text-gray-400 block mt-1">Reuse rinsing water to irrigate backyard plants.</span>
+                    <span className="font-bold text-slate-900 text-sm block">Greywater Recycling</span>
+                    <span className="text-xs text-slate-400 block mt-1">Reuse rinsing water to irrigate backyard plants.</span>
                   </div>
                   <button
                     onClick={() => handleWaterQuickLog(0, 30, "Greywater Irrigation")}
-                    className="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl border border-blue-200 transition cursor-pointer"
+                    className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl border border-blue-200 transition cursor-pointer"
                   >
                     Log Activity (+30L Saved)
                   </button>
@@ -651,7 +710,7 @@ const Dashboard = () => {
 
         {/* ==================== LEARNING CENTER TAB ==================== */}
         {activeTab === "learning" && (
-          <div className="space-y-8">
+          <div className="space-y-8 animate-fadeIn">
             <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-center gap-6">
               <div>
                 <h3 className="text-xl font-bold text-emerald-950 flex items-center gap-2">
@@ -663,7 +722,7 @@ const Dashboard = () => {
               </div>
               <div className="flex items-center gap-3">
                 <div className="px-4 py-2 bg-white rounded-2xl border border-emerald-100 text-center shadow-sm">
-                  <span className="block text-[10px] font-bold text-gray-400 leading-none">QUIZZES SOLVED</span>
+                  <span className="block text-[10px] font-bold text-slate-400 leading-none">QUIZZES SOLVED</span>
                   <span className="text-lg font-extrabold text-emerald-800 leading-none">{completedQuizzes.length} / 3</span>
                 </div>
               </div>
@@ -671,15 +730,14 @@ const Dashboard = () => {
 
             {/* Quiz Interaction Block */}
             {activeQuiz ? (
-              <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-8 max-w-2xl mx-auto">
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl p-8 max-w-2xl mx-auto">
                 {quizStep === "questions" && (
                   <div className="space-y-6">
-                    {/* Header index / Progress */}
-                    <div className="flex justify-between items-center text-xs font-bold text-gray-400">
+                    <div className="flex justify-between items-center text-xs font-extrabold text-slate-400">
                       <span>Quiz: {activeQuiz.title}</span>
                       <span>Question {currentQuestionIndex + 1} of {activeQuiz.questions.length}</span>
                     </div>
-                    <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                       <div
                         className="bg-emerald-500 h-full rounded-full transition-all duration-300"
                         style={{
@@ -688,22 +746,20 @@ const Dashboard = () => {
                       ></div>
                     </div>
 
-                    {/* Question text */}
-                    <h4 className="text-xl font-extrabold text-gray-900 leading-relaxed font-sans">
+                    <h4 className="text-xl font-extrabold text-slate-900 leading-relaxed font-sans">
                       {activeQuiz.questions[currentQuestionIndex].question}
                     </h4>
 
-                    {/* Options list */}
                     <div className="space-y-3">
                       {activeQuiz.questions[currentQuestionIndex].options.map((option, idx) => {
                         const isSelected = selectedOption === idx;
                         const isCorrect = idx === activeQuiz.questions[currentQuestionIndex].answer;
                         
-                        let btnStyle = "border-gray-200 hover:border-emerald-300";
+                        let btnStyle = "border-slate-200 hover:border-emerald-300";
                         if (quizAnswered) {
                           if (isCorrect) btnStyle = "border-emerald-500 bg-emerald-50 text-emerald-950";
                           else if (isSelected) btnStyle = "border-red-500 bg-red-50 text-red-950";
-                          else btnStyle = "border-gray-100 opacity-60";
+                          else btnStyle = "border-slate-100 opacity-60";
                         } else if (isSelected) {
                           btnStyle = "border-emerald-500 bg-emerald-50/50";
                         }
@@ -716,14 +772,13 @@ const Dashboard = () => {
                             className={`w-full p-4 rounded-2xl border-2 text-left font-bold transition-all flex items-center justify-between cursor-pointer ${btnStyle}`}
                           >
                             <span>{option}</span>
-                            {quizAnswered && isCorrect && <span className="text-emerald-600 text-sm">Correct ✓</span>}
-                            {quizAnswered && isSelected && !isCorrect && <span className="text-red-600 text-sm">Incorrect ✗</span>}
+                            {quizAnswered && isCorrect && <span className="text-emerald-600 text-sm font-bold">Correct ✓</span>}
+                            {quizAnswered && isSelected && !isCorrect && <span className="text-red-600 text-sm font-bold">Incorrect ✗</span>}
                           </button>
                         );
                       })}
                     </div>
 
-                    {/* Next step prompt */}
                     {quizAnswered && (
                       <button
                         onClick={handleNextQuestion}
@@ -737,15 +792,15 @@ const Dashboard = () => {
 
                 {quizStep === "summary" && (
                   <div className="text-center space-y-6">
-                    <span className="text-5xl block">🎉</span>
-                    <h4 className="text-2xl font-extrabold text-gray-900">Quiz Completed!</h4>
+                    <span className="text-5xl block animate-bounce">🎉</span>
+                    <h4 className="text-2xl font-extrabold text-slate-900 tracking-tight">Quiz Completed!</h4>
                     
-                    <div className="max-w-md mx-auto p-5 bg-emerald-50 rounded-2xl border border-emerald-100">
-                      <span className="block text-xs text-emerald-700 font-extrabold uppercase">Score Achieved</span>
+                    <div className="max-w-md mx-auto p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+                      <span className="block text-xs text-emerald-700 font-extrabold uppercase tracking-wider">Score Achieved</span>
                       <span className="text-4xl font-extrabold text-emerald-950 font-mono">
                         {Math.round((quizScore / activeQuiz.questions.length) * 100)}%
                       </span>
-                      <span className="text-xs text-gray-500 block mt-2">
+                      <span className="text-xs text-slate-500 block mt-2 leading-relaxed">
                         {quizScore === activeQuiz.questions.length
                           ? "Flawless score! Leafy unlocked outfits in your profile."
                           : "Nice effort! You've learned core practices. Complete again for 100%!"}
@@ -757,7 +812,7 @@ const Dashboard = () => {
                         setActiveQuiz(null);
                         setQuizStep("intro");
                       }}
-                      className="px-8 py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl shadow-[0_4px_0_0_#059669] active:translate-y-1 active:shadow-none transition-all cursor-pointer"
+                      className="px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-2xl shadow-[0_4px_0_0_#059669] active:translate-y-1 active:shadow-none transition-all cursor-pointer"
                     >
                       Back to Learning Dashboard
                     </button>
@@ -765,23 +820,22 @@ const Dashboard = () => {
                 )}
               </div>
             ) : (
-              // Quiz List (Notion Style database / list toggles)
               <div className="space-y-4">
                 {INITIAL_QUIZZES.map((quiz) => {
                   const solved = completedQuizzes.includes(quiz.id);
 
                   return (
-                    <div key={quiz.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div key={quiz.id} className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-gray-900">{quiz.title}</span>
+                          <span className="text-lg font-bold text-slate-900">{quiz.title}</span>
                           {solved && (
-                            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
                               Completed ✓
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-gray-400 font-semibold">
+                        <div className="flex items-center gap-4 text-xs text-slate-400 font-semibold">
                           <span>Difficulty: {quiz.difficulty}</span>
                           <span>•</span>
                           <span>Category: {quiz.category}</span>
@@ -807,15 +861,15 @@ const Dashboard = () => {
 
         {/* ==================== GREEN SCHEMES TAB ==================== */}
         {activeTab === "schemes" && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-fadeIn">
             {/* Notion Database Header */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                     <FaDatabase className="text-emerald-500" /> Notion Eco-Schemes Database
                   </h3>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-slate-400 mt-1">
                     Browse state subsidies, rebates, and tax grants for solar setups, EV integrations, and smart insulation.
                   </p>
                 </div>
@@ -824,22 +878,22 @@ const Dashboard = () => {
               {/* Filters & Search Row */}
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
-                  <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
                     value={schemeSearch}
                     onChange={(e) => setSchemeSearch(e.target.value)}
                     placeholder="Search schemes..."
-                    className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm text-gray-800"
+                    className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm text-slate-800"
                   />
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <FaFilter className="text-gray-400 text-sm" />
+                  <FaFilter className="text-slate-400 text-sm" />
                   <select
                     value={schemeCategoryFilter}
                     onChange={(e) => setSchemeCategoryFilter(e.target.value)}
-                    className="px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 text-sm text-gray-700 bg-white"
+                    className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 text-sm text-slate-700 bg-white"
                   >
                     <option value="All">All Categories</option>
                     <option value="Solar">Solar</option>
@@ -851,38 +905,34 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Notion style Table database */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+            {/* Notion style Table database using filteredSchemes memoization */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-gray-500 border-collapse">
-                  <thead className="text-[10px] text-gray-400 uppercase bg-gray-50 border-b border-gray-100 font-bold tracking-wider">
+                <table className="w-full text-left text-sm text-slate-500 border-collapse">
+                  <thead className="text-[10px] text-slate-400 uppercase bg-slate-50 border-b border-slate-100 font-extrabold tracking-wider">
                     <tr>
-                      <th className="px-6 py-4 font-semibold">Scheme Name</th>
-                      <th className="px-6 py-4 font-semibold">Category</th>
-                      <th className="px-6 py-4 font-semibold">Incentive</th>
-                      <th className="px-6 py-4 font-semibold">Status</th>
-                      <th className="px-6 py-4 font-semibold text-right">Actions</th>
+                      <th className="px-6 py-4">Scheme Name</th>
+                      <th className="px-6 py-4">Category</th>
+                      <th className="px-6 py-4">Incentive</th>
+                      <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 font-sans">
-                    {DEFAULT_SCHEMES.filter((sch) => {
-                      const matchSearch = sch.title.toLowerCase().includes(schemeSearch.toLowerCase()) || sch.desc.toLowerCase().includes(schemeSearch.toLowerCase());
-                      const matchCat = schemeCategoryFilter === "All" || sch.category === schemeCategoryFilter;
-                      return matchSearch && matchCat;
-                    }).map((sch) => {
+                  <tbody className="divide-y divide-slate-100 font-sans">
+                    {filteredSchemes.map((sch) => {
                       const isBookmarked = bookmarkedSchemes.includes(sch.id);
 
                       return (
-                        <tr key={sch.id} className="hover:bg-gray-50/50 transition">
-                          <td className="px-6 py-4 font-bold text-gray-900 cursor-pointer" onClick={() => setSelectedSchemeDetail(sch)}>
+                        <tr key={sch.id} className="hover:bg-slate-50/50 transition">
+                          <td className="px-6 py-4 font-bold text-slate-900 cursor-pointer" onClick={() => setSelectedSchemeDetail(sch)}>
                             {sch.title}
                           </td>
                           <td className="px-6 py-4">
-                            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
                               {sch.category}
                             </span>
                           </td>
-                          <td className="px-6 py-4 font-semibold text-emerald-600">{sch.reward}</td>
+                          <td className="px-6 py-4 font-extrabold text-emerald-600">{sch.reward}</td>
                           <td className="px-6 py-4">
                             <span
                               className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
@@ -895,17 +945,17 @@ const Dashboard = () => {
                           <td className="px-6 py-4 text-right flex justify-end gap-2">
                             <button
                               onClick={() => toggleBookmarkScheme(sch.id)}
-                              className={`p-2.5 rounded-xl border transition ${
+                              className={`p-2.5 rounded-xl border transition cursor-pointer ${
                                 isBookmarked
                                   ? "bg-amber-500 text-white border-amber-500"
-                                  : "bg-white text-gray-400 hover:text-amber-500 border-gray-100 hover:border-amber-200"
+                                  : "bg-white text-slate-400 hover:text-amber-500 border-slate-100 hover:border-amber-200"
                               }`}
                             >
                               <FaBookmark />
                             </button>
                             <button
                               onClick={() => setSelectedSchemeDetail(sch)}
-                              className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-100 font-bold text-xs rounded-xl transition cursor-pointer"
+                              className="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-100 font-bold text-xs rounded-xl transition cursor-pointer"
                             >
                               Details
                             </button>
@@ -913,6 +963,13 @@ const Dashboard = () => {
                         </tr>
                       );
                     })}
+                    {filteredSchemes.length === 0 && (
+                      <tr>
+                        <td colSpan="5" className="px-6 py-12 text-center text-slate-400 font-medium">
+                          No matching schemes found. Adjust search fields.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -922,15 +979,15 @@ const Dashboard = () => {
 
         {/* ==================== AI ASSISTANT TAB ==================== */}
         {activeTab === "ai" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
             {/* Left Chat Window (Apple clean style) */}
-            <div className="lg:col-span-8 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col h-[520px]">
-              <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+            <div className="lg:col-span-8 bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col h-[520px]">
+              <div className="p-5 border-b border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                  <h3 className="font-bold text-gray-900 text-sm">Leafy AI Eco Assistant</h3>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                  <h3 className="font-bold text-slate-900 text-sm">Leafy AI Eco Assistant</h3>
                 </div>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">AI Powered</span>
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">AI Powered</span>
               </div>
 
               {/* Chat Message Logs */}
@@ -945,12 +1002,12 @@ const Dashboard = () => {
                       className={`flex gap-3 max-w-[85%] ${isLeafy ? "self-start" : "ml-auto flex-row-reverse"}`}
                     >
                       <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-sm font-bold shadow-sm ${
-                        isLeafy ? "bg-emerald-100 text-emerald-700" : "bg-gray-200 text-gray-700"
+                        isLeafy ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700"
                       }`}>
                         {isLeafy ? "🌱" : user.name[0]}
                       </div>
                       <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
-                        isLeafy ? "bg-gray-50 text-gray-800 rounded-tl-none border border-gray-100" : "bg-emerald-500 text-white rounded-tr-none shadow-[0_3px_0_0_#059669]"
+                        isLeafy ? "bg-slate-50 text-slate-800 rounded-tl-none border border-slate-100" : "bg-emerald-500 text-white rounded-tr-none shadow-[0_3px_0_0_#059669]"
                       }`}>
                         {msg.text}
                       </div>
@@ -962,13 +1019,15 @@ const Dashboard = () => {
                     <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold shadow-sm animate-pulse">
                       🌱
                     </div>
-                    <div className="p-4 bg-gray-50 text-gray-400 rounded-2xl rounded-tl-none border border-gray-100 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
-                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
-                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
+                    <div className="p-4 bg-slate-50 text-slate-400 rounded-2xl rounded-tl-none border border-slate-100 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                      <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
+                      <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
                     </div>
                   </div>
                 )}
+                {/* DOM element to scroll into view */}
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Chat Input form */}
@@ -977,14 +1036,14 @@ const Dashboard = () => {
                   e.preventDefault();
                   handleSendChatMessage(chatInput);
                 }}
-                className="p-4 border-t border-gray-100 flex gap-2"
+                className="p-4 border-t border-slate-100 flex gap-2"
               >
                 <input
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   placeholder="Ask Leafy about solar, water, composting..."
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm text-gray-800"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm text-slate-800"
                 />
                 <button
                   type="submit"
@@ -997,21 +1056,21 @@ const Dashboard = () => {
 
             {/* Right Quick Prompts Panel (Duolingo Style) */}
             <div className="lg:col-span-4 space-y-6 flex flex-col justify-between h-[520px]">
-              <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex-1">
-                <h4 className="font-bold text-gray-900 text-sm mb-4 flex items-center gap-1.5">
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex-1">
+                <h4 className="font-bold text-slate-900 text-sm mb-4 flex items-center gap-1.5">
                   <span>💡</span> Try Quick Prompts
                 </h4>
                 <div className="space-y-3">
                   {[
                     "How can I reduce my carbon footprint today?",
                     "Explain solar net metering.",
-                    "composting food waste tips.",
+                    "Composting food waste tips.",
                     "Are there federal rebates for EVs?"
                   ].map((prompt, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSendChatMessage(prompt)}
-                      className="w-full p-3.5 border border-gray-100 hover:border-emerald-300 rounded-2xl text-left text-xs font-semibold text-gray-700 hover:text-emerald-800 hover:bg-emerald-50/20 shadow-[0_3px_0_0_#f3f4f6] hover:shadow-none hover:translate-y-0.5 active:translate-y-1 transition-all cursor-pointer"
+                      className="w-full p-3.5 border border-slate-100 hover:border-emerald-300 rounded-2xl text-left text-xs font-semibold text-slate-700 hover:text-emerald-800 hover:bg-emerald-50/20 shadow-[0_3px_0_0_#f3f4f6] hover:shadow-none hover:translate-y-0.5 active:translate-y-1 transition-all cursor-pointer"
                     >
                       {prompt}
                     </button>
@@ -1032,9 +1091,9 @@ const Dashboard = () => {
 
         {/* ==================== LEADERBOARD TAB ==================== */}
         {activeTab === "leaderboard" && (
-          <div className="space-y-8 max-w-4xl mx-auto">
+          <div className="space-y-8 max-w-4xl mx-auto animate-fadeIn">
             {/* Header Shield */}
-            <div className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white rounded-3xl p-6 shadow-[0_4px_12px_rgba(245,158,11,0.3)] flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white rounded-3xl p-6 shadow-[0_6px_15px_rgba(245,158,11,0.25)] flex flex-col sm:flex-row justify-between items-center gap-6 border border-amber-400/20">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-4xl shadow-inner animate-pulse">
                   🏆
@@ -1051,7 +1110,7 @@ const Dashboard = () => {
             </div>
 
             {/* Leaderboard Table list */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden p-6 space-y-4 flex flex-col">
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden p-6 space-y-4 flex flex-col">
               {[
                 { rank: 1, name: "SolarSam", level: 12, xp: 1240, badge: "☀️ Solar Pioneer", isUser: false },
                 { rank: 2, name: "WaterWendy", level: 9, xp: 980, badge: "💧 Water Wizard", isUser: false },
@@ -1061,38 +1120,45 @@ const Dashboard = () => {
               ].sort((a, b) => b.xp - a.xp).map((player, idx) => {
                 const globalRank = idx + 1;
                 let rankVisual = `${globalRank}`;
-                if (globalRank === 1) rankVisual = "🥇";
-                if (globalRank === 2) rankVisual = "🥈";
-                if (globalRank === 3) rankVisual = "🥉";
+                let metallicStyle = "bg-white border-slate-50";
+
+                if (globalRank === 1) {
+                  rankVisual = "🥇";
+                  metallicStyle = "bg-gradient-to-r from-amber-500/5 to-amber-500/0 border-amber-100";
+                } else if (globalRank === 2) {
+                  rankVisual = "🥈";
+                  metallicStyle = "bg-gradient-to-r from-slate-400/5 to-slate-400/0 border-slate-200";
+                } else if (globalRank === 3) {
+                  rankVisual = "🥉";
+                  metallicStyle = "bg-gradient-to-r from-orange-400/5 to-orange-400/0 border-orange-200";
+                } else if (player.isUser) {
+                  metallicStyle = "border-emerald-300 bg-emerald-50/40 shadow-[0_4px_12px_rgba(16,185,129,0.1)] ring-2 ring-emerald-500/20";
+                }
 
                 return (
                   <div
                     key={player.name}
-                    className={`p-4 rounded-2xl border transition flex items-center justify-between ${
-                      player.isUser
-                        ? "border-emerald-300 bg-emerald-50/40 shadow-[0_4px_12px_rgba(16,185,129,0.1)] ring-2 ring-emerald-500/20"
-                        : "border-gray-50 bg-white"
-                    }`}
+                    className={`p-4 rounded-2xl border transition flex items-center justify-between ${metallicStyle}`}
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-lg font-extrabold w-8 text-center">{rankVisual}</span>
-                      <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-xl font-bold">
+                      <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xl font-bold border border-slate-100">
                         {player.isUser ? "🌿" : "👤"}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-gray-900 text-sm">{player.name}</span>
+                          <span className="font-bold text-slate-900 text-sm">{player.name}</span>
                           {player.isUser && (
                             <span className="text-[9px] bg-emerald-500 text-white font-extrabold px-1.5 py-0.2 rounded">YOU</span>
                           )}
                         </div>
-                        <span className="text-xs text-gray-400 block mt-0.5">{player.badge}</span>
+                        <span className="text-xs text-slate-400 block mt-0.5">{player.badge}</span>
                       </div>
                     </div>
 
                     <div className="text-right flex items-center gap-6">
-                      <div className="text-xs font-semibold text-gray-400">Level {player.level}</div>
-                      <div className="text-sm font-extrabold text-gray-900 font-mono w-20">{player.xp} XP</div>
+                      <div className="text-xs font-semibold text-slate-400">Level {player.level}</div>
+                      <div className="text-sm font-extrabold text-slate-900 font-mono w-20">{player.xp} XP</div>
                     </div>
                   </div>
                 );
@@ -1103,8 +1169,8 @@ const Dashboard = () => {
             <div className="bg-amber-50/50 border border-amber-100 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-center gap-6">
               <div className="space-y-1">
                 <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest block">Group Challenge</span>
-                <span className="font-bold text-gray-900 text-sm block">Weekly Team Target: Harvest 150 Liters Rainwater</span>
-                <span className="text-xs text-gray-500 block">Current collective savings: **110 Liters / 150 Liters**</span>
+                <span className="font-bold text-slate-900 text-sm block font-sans">Weekly Team Target: Harvest 150 Liters Rainwater</span>
+                <span className="text-xs text-slate-500 block">Current collective savings: **110 Liters / 150 Liters**</span>
               </div>
               <div className="w-full md:w-[250px] space-y-2">
                 <div className="w-full bg-amber-100 h-2.5 rounded-full overflow-hidden">
@@ -1124,35 +1190,35 @@ const Dashboard = () => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-white rounded-3xl border border-gray-100 shadow-2xl p-6 md:p-8 max-w-lg w-full space-y-6"
+                className="bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 md:p-8 max-w-lg w-full space-y-6"
               >
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700">
                       {selectedSchemeDetail.category}
                     </span>
-                    <h3 className="text-xl font-extrabold text-gray-900 mt-2">{selectedSchemeDetail.title}</h3>
+                    <h3 className="text-xl font-extrabold text-slate-900 mt-2">{selectedSchemeDetail.title}</h3>
                   </div>
                   <button
                     onClick={() => setSelectedSchemeDetail(null)}
-                    className="p-1 text-gray-400 hover:text-gray-600 text-lg font-bold"
+                    className="p-1 text-slate-400 hover:text-slate-600 text-lg font-bold"
                   >
                     ✕
                   </button>
                 </div>
 
-                <div className="space-y-4 text-sm text-gray-600 font-sans">
+                <div className="space-y-4 text-sm text-slate-600 font-sans">
                   <div>
-                    <span className="block text-xs text-gray-400 font-bold uppercase">Governing Body</span>
-                    <span className="text-gray-900 font-semibold">{selectedSchemeDetail.authority}</span>
+                    <span className="block text-xs text-slate-400 font-bold uppercase">Governing Body</span>
+                    <span className="text-slate-900 font-semibold">{selectedSchemeDetail.authority}</span>
                   </div>
                   <div>
-                    <span className="block text-xs text-gray-400 font-bold uppercase">Reward Details</span>
+                    <span className="block text-xs text-slate-400 font-bold uppercase">Reward Details</span>
                     <span className="text-emerald-600 font-extrabold">{selectedSchemeDetail.reward}</span>
                   </div>
                   <div>
-                    <span className="block text-xs text-gray-400 font-bold uppercase">Description</span>
-                    <p className="leading-relaxed mt-1 text-gray-500">{selectedSchemeDetail.desc}</p>
+                    <span className="block text-xs text-slate-400 font-bold uppercase">Description</span>
+                    <p className="leading-relaxed mt-1 text-slate-500">{selectedSchemeDetail.desc}</p>
                   </div>
                 </div>
 
@@ -1164,7 +1230,7 @@ const Dashboard = () => {
                     className={`flex-1 py-3 border font-bold text-sm rounded-xl transition ${
                       bookmarkedSchemes.includes(selectedSchemeDetail.id)
                         ? "bg-amber-500 border-amber-500 text-white"
-                        : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                        : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                     }`}
                   >
                     {bookmarkedSchemes.includes(selectedSchemeDetail.id) ? "Bookmarked ✓" : "Bookmark Scheme"}
