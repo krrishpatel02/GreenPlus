@@ -67,6 +67,42 @@ const Dashboard = () => {
   const [schemeCategoryFilter, setSchemeCategoryFilter] = useState("All");
   const [selectedSchemeDetail, setSelectedSchemeDetail] = useState(null);
 
+  // AI Chatbot State
+  const [chatMessages, setChatMessages] = useState([
+    { sender: "leafy", text: "Hey! I am Leafy, your AI Eco Assistant. Ask me anything about saving energy, water, composting, or green rebates! 🤖🌿" }
+  ]);
+  const [chatInput, setChatInput] = useState("");
+  const [isChatThinking, setIsChatThinking] = useState(false);
+
+  const handleSendChatMessage = (text) => {
+    if (!text.trim()) return;
+
+    const userMessage = { sender: "user", text };
+    setChatMessages((prev) => [...prev, userMessage]);
+    setChatInput("");
+    setIsChatThinking(true);
+
+    setTimeout(() => {
+      const query = text.toLowerCase();
+      let replyText = "";
+
+      if (query.includes("solar") || query.includes("panel") || query.includes("electric") || query.includes("energy") || query.includes("net metering") || query.includes("power")) {
+        replyText = "Solar energy is a game-changer! You can generate your own power, save on utility bills, and get up to 30% tax credits (check our Green Schemes tab). I recommend starting with the Solar Basics quiz in the Learning Center to earn 50 XP! ⚡☀️";
+      } else if (query.includes("water") || query.includes("greywater") || query.includes("rainwater") || query.includes("shower") || query.includes("save")) {
+        replyText = "Conserving water is vital. Quick tips: restrict shower times to 5 minutes (saves ~40L), reuse kitchen rinse water for backyard soil, and check if your local utility offers rainwater tank subsidies. Log your savings today to gain XP! 💧🏺";
+      } else if (query.includes("compost") || query.includes("recycle") || query.includes("waste") || query.includes("garbage") || query.includes("food")) {
+        replyText = "Compost turns food scraps into earth gold! Avoid composting meat, dairy, or oily foods as they attract pests. Instead, stick to fruit peels, coffee grounds, eggshells, and dry leaves. You will save waste from landfill methane! 🪱🍂";
+      } else if (query.includes("rebate") || query.includes("scheme") || query.includes("incentive") || query.includes("credit") || query.includes("grant") || query.includes("tax")) {
+        replyText = "Excellent! Governments offer massive incentives for going green: up to $7,500 for electric vehicles, 30% tax credits for home solar, and $500 for home EV charger setups. Click on our **Green Schemes** database tab! 🏛️💰";
+      } else {
+        replyText = "That is a great question! Living sustainably is a journey of small daily habits. Try completing today's eco-checklist, or ask me about 'Solar energy', 'Water saving', or 'Composting tips'! 🌿";
+      }
+
+      setChatMessages((prev) => [...prev, { sender: "leafy", text: replyText }]);
+      setIsChatThinking(false);
+    }, 1000);
+  };
+
   // Handler helpers
   const handleLogEnergySubmit = (e) => {
     e.preventDefault();
@@ -175,6 +211,22 @@ const Dashboard = () => {
             }`}
           >
             <span>🏛️</span> Green Schemes
+          </button>
+          <button
+            onClick={() => setActiveTab("ai")}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition ${
+              activeTab === "ai" ? "bg-gray-800 text-white" : "hover:bg-gray-900 text-gray-400"
+            }`}
+          >
+            <span>🤖</span> AI Assistant
+          </button>
+          <button
+            onClick={() => setActiveTab("leaderboard")}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition ${
+              activeTab === "leaderboard" ? "bg-gray-800 text-white" : "hover:bg-gray-900 text-gray-400"
+            }`}
+          >
+            <span>🏆</span> Leaderboard
           </button>
         </nav>
 
@@ -863,6 +915,202 @@ const Dashboard = () => {
                     })}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== AI ASSISTANT TAB ==================== */}
+        {activeTab === "ai" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left Chat Window (Apple clean style) */}
+            <div className="lg:col-span-8 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col h-[520px]">
+              <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                  <h3 className="font-bold text-gray-900 text-sm">Leafy AI Eco Assistant</h3>
+                </div>
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">AI Powered</span>
+              </div>
+
+              {/* Chat Message Logs */}
+              <div className="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col">
+                {chatMessages.map((msg, index) => {
+                  const isLeafy = msg.sender === "leafy";
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      key={index}
+                      className={`flex gap-3 max-w-[85%] ${isLeafy ? "self-start" : "ml-auto flex-row-reverse"}`}
+                    >
+                      <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-sm font-bold shadow-sm ${
+                        isLeafy ? "bg-emerald-100 text-emerald-700" : "bg-gray-200 text-gray-700"
+                      }`}>
+                        {isLeafy ? "🌱" : user.name[0]}
+                      </div>
+                      <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
+                        isLeafy ? "bg-gray-50 text-gray-800 rounded-tl-none border border-gray-100" : "bg-emerald-500 text-white rounded-tr-none shadow-[0_3px_0_0_#059669]"
+                      }`}>
+                        {msg.text}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                {isChatThinking && (
+                  <div className="flex gap-3 max-w-[80%] self-start">
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold shadow-sm animate-pulse">
+                      🌱
+                    </div>
+                    <div className="p-4 bg-gray-50 text-gray-400 rounded-2xl rounded-tl-none border border-gray-100 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Chat Input form */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendChatMessage(chatInput);
+                }}
+                className="p-4 border-t border-gray-100 flex gap-2"
+              >
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask Leafy about solar, water, composting..."
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm text-gray-800"
+                />
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl shadow-[0_3px_0_0_#059669] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer text-xs"
+                >
+                  Send
+                </button>
+              </form>
+            </div>
+
+            {/* Right Quick Prompts Panel (Duolingo Style) */}
+            <div className="lg:col-span-4 space-y-6 flex flex-col justify-between h-[520px]">
+              <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex-1">
+                <h4 className="font-bold text-gray-900 text-sm mb-4 flex items-center gap-1.5">
+                  <span>💡</span> Try Quick Prompts
+                </h4>
+                <div className="space-y-3">
+                  {[
+                    "How can I reduce my carbon footprint today?",
+                    "Explain solar net metering.",
+                    "composting food waste tips.",
+                    "Are there federal rebates for EVs?"
+                  ].map((prompt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSendChatMessage(prompt)}
+                      className="w-full p-3.5 border border-gray-100 hover:border-emerald-300 rounded-2xl text-left text-xs font-semibold text-gray-700 hover:text-emerald-800 hover:bg-emerald-50/20 shadow-[0_3px_0_0_#f3f4f6] hover:shadow-none hover:translate-y-0.5 active:translate-y-1 transition-all cursor-pointer"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mini Mascot advice widget */}
+              <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-5 flex items-center gap-4">
+                <div className="text-3xl">🤖</div>
+                <div className="text-xs text-emerald-800 font-semibold leading-relaxed">
+                  Leafy AI reads your profile metrics to recommend custom carbon saving tips. Keep querying!
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== LEADERBOARD TAB ==================== */}
+        {activeTab === "leaderboard" && (
+          <div className="space-y-8 max-w-4xl mx-auto">
+            {/* Header Shield */}
+            <div className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white rounded-3xl p-6 shadow-[0_4px_12px_rgba(245,158,11,0.3)] flex flex-col sm:flex-row justify-between items-center gap-6">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-4xl shadow-inner animate-pulse">
+                  🏆
+                </div>
+                <div>
+                  <h3 className="text-xl font-extrabold tracking-tight">GreenPlus Emerald League</h3>
+                  <p className="text-xs opacity-95 mt-0.5 font-medium">Rankings reset in 3 days. Complete tasks to top the table!</p>
+                </div>
+              </div>
+              <div className="text-center sm:text-right shrink-0">
+                <span className="block text-[10px] font-extrabold uppercase tracking-widest text-amber-100">Weekly Pool</span>
+                <span className="text-xl font-extrabold text-white font-mono">+250 XP Grand Prize</span>
+              </div>
+            </div>
+
+            {/* Leaderboard Table list */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden p-6 space-y-4 flex flex-col">
+              {[
+                { rank: 1, name: "SolarSam", level: 12, xp: 1240, badge: "☀️ Solar Pioneer", isUser: false },
+                { rank: 2, name: "WaterWendy", level: 9, xp: 980, badge: "💧 Water Wizard", isUser: false },
+                { rank: 3, name: "GreenGodzilla", level: 6, xp: 620, badge: "🦎 Wildlife Knight", isUser: false },
+                { rank: 4, name: user.name, level: user.level, xp: user.level * 100 + user.xp, badge: "🌿 Active Champion", isUser: true },
+                { rank: 5, name: "EcoEmily", level: 3, xp: 240, badge: "🌸 Plant Lover", isUser: false },
+              ].sort((a, b) => b.xp - a.xp).map((player, idx) => {
+                const globalRank = idx + 1;
+                let rankVisual = `${globalRank}`;
+                if (globalRank === 1) rankVisual = "🥇";
+                if (globalRank === 2) rankVisual = "🥈";
+                if (globalRank === 3) rankVisual = "🥉";
+
+                return (
+                  <div
+                    key={player.name}
+                    className={`p-4 rounded-2xl border transition flex items-center justify-between ${
+                      player.isUser
+                        ? "border-emerald-300 bg-emerald-50/40 shadow-[0_4px_12px_rgba(16,185,129,0.1)] ring-2 ring-emerald-500/20"
+                        : "border-gray-50 bg-white"
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-lg font-extrabold w-8 text-center">{rankVisual}</span>
+                      <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-xl font-bold">
+                        {player.isUser ? "🌿" : "👤"}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-gray-900 text-sm">{player.name}</span>
+                          {player.isUser && (
+                            <span className="text-[9px] bg-emerald-500 text-white font-extrabold px-1.5 py-0.2 rounded">YOU</span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-400 block mt-0.5">{player.badge}</span>
+                      </div>
+                    </div>
+
+                    <div className="text-right flex items-center gap-6">
+                      <div className="text-xs font-semibold text-gray-400">Level {player.level}</div>
+                      <div className="text-sm font-extrabold text-gray-900 font-mono w-20">{player.xp} XP</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Weekly Goal Progress */}
+            <div className="bg-amber-50/50 border border-amber-100 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest block">Group Challenge</span>
+                <span className="font-bold text-gray-900 text-sm block">Weekly Team Target: Harvest 150 Liters Rainwater</span>
+                <span className="text-xs text-gray-500 block">Current collective savings: **110 Liters / 150 Liters**</span>
+              </div>
+              <div className="w-full md:w-[250px] space-y-2">
+                <div className="w-full bg-amber-100 h-2.5 rounded-full overflow-hidden">
+                  <div className="bg-amber-500 h-full rounded-full w-[73%] transition-all"></div>
+                </div>
+                <span className="text-[10px] text-amber-600 font-bold block text-right">73% Completed</span>
               </div>
             </div>
           </div>
