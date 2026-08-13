@@ -1,4 +1,6 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react-hooks/set-state-in-effect */
+import { createContext, useState, useContext, useEffect } from "react";
 
 const EcoContext = createContext();
 

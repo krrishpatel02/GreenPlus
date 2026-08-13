@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
@@ -7,7 +7,7 @@ import { FaLeaf, FaBolt, FaTint, FaGraduationCap, FaChevronRight, FaArrowLeft } 
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { addXp, setUser } = useEco();
+  const { addXp } = useEco();
 
   // Calculator Wizard State
   const [step, setStep] = useState(0); // 0: Intro, 1: Commute, 2: Energy, 3: Recycling, 4: Results

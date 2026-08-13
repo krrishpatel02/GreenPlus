@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
-import { motion } from "framer-motion";
 import { FaUser, FaTrophy, FaRedo, FaEdit, FaCheck, FaLock } from "react-icons/fa";
 
 const ALL_BADGES = [

@@ -1,4 +1,3 @@
-import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Mascot = ({ mood = "happy", outfit = "default", speechText = "" }) => {

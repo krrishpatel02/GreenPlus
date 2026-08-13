@@ -1,4 +1,4 @@
-import React from "react";
+// React default import not required (automatic JSX runtime)
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,

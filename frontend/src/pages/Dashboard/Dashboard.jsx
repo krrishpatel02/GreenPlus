@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
 import TeslaChart from "../../componentes/ui/TeslaChart";
@@ -17,8 +17,6 @@ import {
   FaFire,
   FaAngleRight,
   FaShareSquare,
-  FaTrophy,
-  FaPlusCircle,
   FaSearch,
   FaFilter,
 } from "react-icons/fa";
@@ -31,7 +29,7 @@ const Dashboard = () => {
     waterLogs,
     completedQuizzes,
     bookmarkedSchemes,
-    badges,
+    
     DEFAULT_SCHEMES,
     INITIAL_QUIZZES,
     addEnergyLog,

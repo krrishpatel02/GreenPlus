@@ -1,4 +1,3 @@
-import React from "react";
 import { EcoProvider } from "./context/EcoContext";
 import AppRoutes from "./routes/AppRoutes";
 
