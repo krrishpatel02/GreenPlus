@@ -14,6 +14,99 @@
   }
 }
 
+/* Theme variables: Navy blue, Green, Cream */
+:root {
+  --color-navy: #0b2740; /* deep navy */
+  --color-green: #0fa26a; /* vibrant green */
+  --color-cream: #f6f3ea; /* soft cream background */
+  --color-cream-2: #fffdf8; /* lighter cream */
+  --color-muted: #9ca3af; /* muted text */
+  --color-border: #e9e6dd; /* subtle border */
+}
+
+/* Global theme overrides for commonly used utility classes (cascade-based)
+   These map existing Tailwind utility classes used across the app to the
+   new navy/green/cream palette so the theme change is applied without
+   modifying many component files. */
+
+/* Page background and primary surfaces */
+body, .min-h-screen {
+  background-color: var(--color-cream) !important;
+  color: var(--color-navy) !important;
+}
+
+/* White card surfaces -> cream */
+.bg-white {
+  background-color: var(--color-cream-2) !important;
+}
+
+/* Dark sidebar / header -> navy */
+.bg-slate-900,
+.bg-slate-900\/60,
+.bg-slate-800 {
+  background-color: var(--color-navy) !important;
+  color: var(--color-cream) !important;
+}
+
+/* Light slate backgrounds -> subtle cream variants */
+.bg-slate-50,
+.bg-slate-100,
+.bg-slate-50\/50,
+.bg-slate-50\/30 {
+  background-color: var(--color-cream) !important;
+}
+
+/* Primary text colors */
+.text-slate-900,
+.text-gray-900,
+.text-slate-800,
+.text-slate-700 {
+  color: var(--color-navy) !important;
+}
+
+/* Muted text on dark backgrounds */
+.text-slate-300,
+.text-slate-400,
+.text-gray-400 {
+  color: var(--color-cream-2) !important;
+}
+
+/* Borders */
+.border-slate-100,
+.border-gray-100,
+.border-slate-50,
+.border-slate-200,
+.border-slate-800,
+.border-slate-900 {
+  border-color: var(--color-border) !important;
+}
+
+/* Accent green mapping */
+.bg-emerald-500,
+.bg-emerald-600 {
+  background-color: var(--color-green) !important;
+}
+.text-emerald-700,
+.text-emerald-600 {
+  color: var(--color-green) !important;
+}
+.border-emerald-100,
+.border-emerald-200 {
+  border-color: color-mix(in srgb, var(--color-green) 15%, white) !important;
+}
+
+/* Buttons and callouts that used blue highlights -> use green shadows */
+.shadow-\[0_4px_0_0_\#93c5fd\], .shadow-\[0_4px_0_0_\#d97706\] {
+  box-shadow: 0 4px 0 0 color-mix(in srgb, var(--color-green) 35%, #0000) !important;
+}
+
+/* Ensure inputs and panels remain readable */
+input, textarea, select {
+  background-color: white;
+  color: var(--color-navy);
+  border-color: var(--color-border);
+}
+
 /* Notion-style sleek custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
