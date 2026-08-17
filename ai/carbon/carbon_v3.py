@@ -24,16 +24,13 @@ from sklearn.metrics import (
 
 # GREENPLUS CARBON AI - V3
 
-
 DATASET = "carbonv3.csv"
 MODEL_FILE = "carbon_model_v3.joblib"
 
 RANDOM_STATE = 42
 
 
-print("\n==============================================")
-print("       🌱 GREENPLUS CARBON AI - V3")
-print("==============================================")
+print("\n🌱 GREENPLUS CARBON AI - V3\n")
 
 
 
@@ -45,10 +42,7 @@ df = pd.read_csv(DATASET)
 print("\nDataset:")
 print("Shape:", df.shape)
 
-
-# ============================================================
 # 2. REMOVE DUPLICATES
-# ============================================================
 
 duplicates = df.duplicated().sum()
 
@@ -56,10 +50,7 @@ df = df.drop_duplicates()
 
 print("Duplicates removed:", duplicates)
 
-
-# ============================================================
 # 3. TARGET
-# ============================================================
 
 TARGET = "carbon_emission_kg"
 
@@ -72,10 +63,7 @@ df = df.dropna(
     subset=[TARGET]
 )
 
-
-# ============================================================
 # 4. FEATURES / TARGET
-# ============================================================
 
 X = df.drop(
     columns=[TARGET]
@@ -86,10 +74,7 @@ y = df[TARGET]
 
 print("\nTotal input features:", X.shape[1])
 
-
-# ============================================================
 # 5. FEATURE TYPES
-# ============================================================
 
 categorical_features = [
     "location_type",
@@ -107,10 +92,7 @@ numeric_features = [
 print("Numeric features:", len(numeric_features))
 print("Categorical features:", len(categorical_features))
 
-
-# ============================================================
 # 6. PREPROCESSING
-# ============================================================
 
 numeric_pipeline = Pipeline(
     steps=[
@@ -157,10 +139,7 @@ preprocessor = ColumnTransformer(
     ]
 )
 
-
-# ============================================================
 # 7. 80/20 SPLIT
-# ============================================================
 
 X_train, X_test, y_train, y_test = train_test_split(
     X,
@@ -170,17 +149,12 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 
-print("\n==============================================")
-print("             80/20 TRAIN TEST")
-print("==============================================")
+print("\n80/20 TRAIN TEST\n")
 
 print("Training samples:", len(X_train))
 print("Testing samples :", len(X_test))
 
-
-# ============================================================
 # 8. RANDOM FOREST
-# ============================================================
 
 rf_model = RandomForestRegressor(
     n_estimators=500,
@@ -200,10 +174,7 @@ rf_pipeline = Pipeline(
     ]
 )
 
-
-# ============================================================
 # 9. GRADIENT BOOSTING
-# ============================================================
 
 gb_model = GradientBoostingRegressor(
     n_estimators=500,
@@ -223,10 +194,7 @@ gb_pipeline = Pipeline(
     ]
 )
 
-
-# ============================================================
 # 10. EXTRA TREES
-# ============================================================
 
 extra_model = ExtraTreesRegressor(
     n_estimators=500,
@@ -246,10 +214,7 @@ extra_pipeline = Pipeline(
     ]
 )
 
-
-# ============================================================
 # 11. TRAIN MODELS
-# ============================================================
 
 print("\nTraining Random Forest...")
 
@@ -280,10 +245,7 @@ extra_pipeline.fit(
 
 print("Extra Trees completed.")
 
-
-# ============================================================
 # 12. EVALUATION
-# ============================================================
 
 def evaluate_model(
     name,
@@ -311,9 +273,7 @@ def evaluate_model(
         prediction
     )
 
-    print("\n----------------------------------------------")
-    print(name)
-    print("----------------------------------------------")
+    print(f"\n{name}")
 
     print(
         f"MAE  : {mae:.2f} kg CO2e"
@@ -354,10 +314,7 @@ extra_result = evaluate_model(
     extra_pipeline
 )
 
-
-# ============================================================
 # 13. SELECT BEST MODEL
-# ============================================================
 
 results = [
     rf_result,
@@ -372,9 +329,7 @@ best = max(
 )
 
 
-print("\n==============================================")
-print("              🏆 BEST V3 MODEL")
-print("==============================================")
+print("\n🏆 BEST V3 MODEL\n")
 
 
 print(
@@ -394,14 +349,9 @@ print(
     f"R²   : {best['r2']:.4f}"
 )
 
-
-# ============================================================
 # 14. 5-FOLD CROSS VALIDATION
-# ============================================================
 
-print("\n==============================================")
-print("             5-FOLD CV")
-print("==============================================")
+print("\n5-FOLD CV\n")
 
 
 cv_scores = cross_val_score(
@@ -432,20 +382,14 @@ print(
     f"CV Std    : {cv_scores.std():.4f}"
 )
 
-
-# ============================================================
 # 15. SAVE MODEL
-# ============================================================
 
 joblib.dump(
     best["model"],
     MODEL_FILE
 )
 
-
-# ============================================================
 # 16. SAVE PREDICTIONS
-# ============================================================
 
 prediction_df = pd.DataFrame({
 
@@ -466,10 +410,7 @@ prediction_df.to_csv(
     index=False
 )
 
-
-# ============================================================
 # 17. SAVE MODEL COMPARISON
-# ============================================================
 
 comparison = pd.DataFrame({
 
@@ -501,14 +442,9 @@ comparison.to_csv(
     index=False
 )
 
-
-# ============================================================
 # 18. FINAL
-# ============================================================
 
-print("\n==============================================")
-print("        🌱 GREENPLUS V3 MODEL READY")
-print("==============================================")
+print("\n🌱 GREENPLUS V3 MODEL READY\n")
 
 print(
     "Saved model:",
