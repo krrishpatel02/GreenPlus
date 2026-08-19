@@ -1,9 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
+import { Reveal } from "../../componentes/common/AnimatedPage";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaLeaf, FaBolt, FaTint, FaGraduationCap, FaChevronRight, FaArrowLeft } from "react-icons/fa";
+import { FaLeaf, FaBolt, FaTint, FaGraduationCap, FaChevronRight, FaArrowLeft, FaChevronLeft, FaChartLine, FaShieldAlt, FaSeedling } from "react-icons/fa";
+import "./LandingPage.css";
+
+const impactSlides = [
+  {
+    eyebrow: "Your week in motion",
+    title: "Small choices compound.",
+    detail: "Track the quiet wins that add up to a lighter footprint.",
+    value: "18.4 kg",
+    label: "CO2 avoided this week",
+    color: "mint",
+  },
+  {
+    eyebrow: "Community pulse",
+    title: "Good habits travel.",
+    detail: "See how your daily actions move the collective score forward.",
+    value: "2,840",
+    label: "eco actions logged today",
+    color: "sun",
+  },
+  {
+    eyebrow: "Level up",
+    title: "Progress feels better together.",
+    detail: "Turn practical learning into streaks, XP, and lasting change.",
+    value: "+240 XP",
+    label: "ready to earn this week",
+    color: "sky",
+  },
+];
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -14,6 +43,19 @@ const LandingPage = () => {
   const [commute, setCommute] = useState("");
   const [energySource, setEnergySource] = useState("");
   const [recycling, setRecycling] = useState("");
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const carouselTimer = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % impactSlides.length);
+    }, 5000);
+
+    return () => window.clearInterval(carouselTimer);
+  }, []);
+
+  const changeSlide = (direction) => {
+    setActiveSlide((current) => (current + direction + impactSlides.length) % impactSlides.length);
+  };
 
   const calculateFootprint = () => {
     let base = 50;
@@ -57,11 +99,12 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans">
+    <div className="landing-page min-h-screen bg-white text-gray-900 font-sans">
       {/* Hero Section (Clean like Apple, Modern like Tesla) */}
-      <section className="relative pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto flex flex-col items-center text-center overflow-hidden">
+      <section className="landing-hero relative pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto flex flex-col items-center text-center overflow-hidden">
         {/* Abstract glowing backgrounds */}
-        <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-emerald-200/40 to-blue-200/40 filter blur-3xl rounded-full -z-10 animate-pulse"></div>
+        <div className="hero-orbit hero-orbit-one" />
+        <div className="hero-orbit hero-orbit-two" />
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -69,18 +112,20 @@ const LandingPage = () => {
           transition={{ duration: 0.8 }}
           className="max-w-4xl"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-xs tracking-wider uppercase mb-6 border border-emerald-100">
+          <span className="hero-kicker inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-xs tracking-wider uppercase mb-6 border border-emerald-100">
             <FaLeaf className="text-emerald-500 animate-spin" style={{ animationDuration: "8s" }} /> Smart Eco-Gamification
           </span>
-          <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.05] mb-8 font-sans">
+          <h1 className="hero-title text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.05] mb-8 font-sans">
             Tracking Carbon, <br />
             <span className="bg-gradient-to-r from-emerald-600 to-emerald-400 bg-clip-text text-transparent">
               Growing Habits.
             </span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed font-sans font-light">
-            GreenPlus makes eco-friendly living rewarding. Track daily electricity & water savings, learn with byte-sized quests, and unlock regional rebates.
-          </p>
+          <div className="hero-signal-row" aria-label="GreenPlus capabilities">
+            <span><FaChartLine /> Live footprint</span>
+            <span><FaSeedling /> Habit streaks</span>
+            <span><FaShieldAlt /> Local rewards</span>
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <motion.button
@@ -104,17 +149,78 @@ const LandingPage = () => {
             </motion.button>
           </div>
         </motion.div>
+
+        <motion.div
+          className="impact-carousel"
+          initial={{ opacity: 0, y: 36 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className={`impact-carousel__glow impact-carousel__glow--${impactSlides[activeSlide].color}`} />
+          <div className="impact-carousel__topline">
+            <span className="impact-live"><span /> LIVE IMPACT FEED</span>
+            <div className="impact-controls">
+              <button aria-label="Previous impact" onClick={() => changeSlide(-1)}><FaChevronLeft /></button>
+              <button aria-label="Next impact" onClick={() => changeSlide(1)}><FaChevronRight /></button>
+            </div>
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSlide}
+              className="impact-carousel__content"
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+            >
+              <div>
+                <p className="impact-eyebrow">{impactSlides[activeSlide].eyebrow}</p>
+                <h2>{impactSlides[activeSlide].title}</h2>
+                <p className="impact-detail">{impactSlides[activeSlide].detail}</p>
+              </div>
+              <div className="impact-value">
+                <strong>{impactSlides[activeSlide].value}</strong>
+                <span>{impactSlides[activeSlide].label}</span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+          <div className="impact-dots" aria-label="Impact slides">
+            {impactSlides.map((slide, index) => (
+              <button
+                key={slide.eyebrow}
+                aria-label={`Show ${slide.eyebrow}`}
+                className={index === activeSlide ? "is-active" : ""}
+                onClick={() => setActiveSlide(index)}
+              />
+            ))}
+          </div>
+        </motion.div>
       </section>
 
+      <motion.div
+        className="floating-action-bar"
+        initial={{ opacity: 0, y: 20, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 1, duration: 0.6 }}
+      >
+        <span className="floating-status"><FaChartLine /> Carbon baseline ready</span>
+        <span className="floating-divider" />
+        <span className="floating-stat"><strong>3</strong> quick questions</span>
+        <button onClick={() => document.getElementById("calculator-section")?.scrollIntoView({ behavior: "smooth" })}>
+          Start now <FaChevronRight />
+        </button>
+      </motion.div>
+
       {/* Interactive Eco Calculator Section (Duolingo + Apple Style) */}
-      <section id="calculator-section" className="py-20 bg-gray-50 border-y border-gray-100 px-6 md:px-12">
+      <Reveal>
+      <section id="calculator-section" className="landing-calculator py-20 bg-gray-50 border-y border-gray-100 px-6 md:px-12">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="landing-section-heading text-center mb-12">
             <h2 className="text-3xl font-extrabold tracking-tight">Eco-Baseline Calculator</h2>
             <p className="text-gray-500 mt-2">Get an instant carbon estimate and unlock Leafy's rewards.</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-white rounded-3xl border border-gray-100 shadow-xl p-6 md:p-10">
+          <div className="landing-calculator__panel grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-white rounded-3xl border border-gray-100 shadow-xl p-6 md:p-10">
             {/* Mascot advice */}
             <div className="lg:col-span-5 flex justify-center">
               <Mascot mood={step === 4 ? "celebrate" : step === 0 ? "happy" : "thinking"} speechText={getMascotSpeech()} />
@@ -275,10 +381,12 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+      </Reveal>
 
       {/* App Features Grid (Apple-style simplicity) */}
-      <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
-        <div className="text-center mb-16">
+      <Reveal>
+      <section className="landing-features py-24 px-6 md:px-12 max-w-7xl mx-auto">
+        <div className="landing-section-heading text-center mb-16">
           <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight font-sans">
             An Ecosystem of Action
           </h2>
@@ -287,9 +395,9 @@ const LandingPage = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="landing-feature-grid grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Card 1 */}
-          <div className="p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition bg-white flex flex-col justify-between h-[300px]">
+          <motion.div initial={{ opacity: 0, x: -42 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ delay: 0.08, duration: 0.65 }} whileHover={{ y: -6 }} className="landing-feature-card landing-feature-card--side p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition bg-white flex flex-col justify-between h-[300px]">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg mb-6">
                 <FaBolt />
@@ -300,10 +408,10 @@ const LandingPage = () => {
               </p>
             </div>
             <span className="text-amber-500 text-xs font-bold uppercase tracking-wider">⚡ Energy Hub</span>
-          </div>
+          </motion.div>
 
           {/* Card 2 */}
-          <div className="p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition bg-white flex flex-col justify-between h-[300px]">
+          <motion.div initial={{ opacity: 0, y: 42 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ delay: 0.18, duration: 0.65 }} whileHover={{ y: -6 }} className="landing-feature-card landing-feature-card--side p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition bg-white flex flex-col justify-between h-[300px]">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-lg mb-6">
                 <FaTint />
@@ -314,10 +422,10 @@ const LandingPage = () => {
               </p>
             </div>
             <span className="text-blue-500 text-xs font-bold uppercase tracking-wider">💧 Hydration & Savings</span>
-          </div>
+          </motion.div>
 
           {/* Card 3 */}
-          <div className="p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition bg-white flex flex-col justify-between h-[300px]">
+          <motion.div initial={{ opacity: 0, x: 42 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ delay: 0.28, duration: 0.65 }} whileHover={{ y: -6 }} className="landing-feature-card landing-feature-card--side p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition bg-white flex flex-col justify-between h-[300px]">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-lg mb-6">
                 <FaGraduationCap />
@@ -328,12 +436,13 @@ const LandingPage = () => {
               </p>
             </div>
             <span className="text-emerald-500 text-xs font-bold uppercase tracking-wider">🌿 Learn & Level Up</span>
-          </div>
+          </motion.div>
         </div>
       </section>
+      </Reveal>
 
       {/* Elegant Footer */}
-      <footer className="py-12 bg-gray-900 text-gray-400 border-t border-gray-800 text-center text-sm font-sans">
+      <footer className="landing-footer py-12 bg-gray-900 text-gray-400 border-t border-gray-800 text-center text-sm font-sans">
         <p className="flex items-center justify-center gap-2 text-white font-bold mb-3">
           <FaLeaf className="text-emerald-500" /> GreenPlus
         </p>

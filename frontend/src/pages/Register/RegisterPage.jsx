@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
 import { motion } from "framer-motion";
+import AnimatedPage, { Reveal } from "../../componentes/common/AnimatedPage";
 
 const RegisterPage = () => {
   const { setUser } = useEco();
@@ -22,6 +23,7 @@ const RegisterPage = () => {
   };
 
   return (
+    <AnimatedPage className="auth-motion-page">
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 relative overflow-hidden">
       {/* Background design accents */}
       <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-100/50 filter blur-3xl -z-10"></div>
@@ -29,7 +31,7 @@ const RegisterPage = () => {
 
       <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* Left Side: Friendly Mascot Interaction */}
-        <div className="lg:col-span-5 flex flex-col items-center justify-center text-center lg:text-left">
+        <Reveal className="lg:col-span-5 flex flex-col items-center justify-center text-center lg:text-left" direction="left">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -40,10 +42,11 @@ const RegisterPage = () => {
               speechText="Awesome decision! Creating an account unlocks custom badges, solar rebates, and daily carbon metrics. Let's grow together! 🌱📈"
             />
           </motion.div>
-        </div>
+        </Reveal>
 
         {/* Right Side: Elegant Form */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-gray-100 shadow-xl p-8 md:p-12">
+        <Reveal className="lg:col-span-7" direction="right" delay={0.12}>
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-8 md:p-12">
           <div className="mb-8">
             <h2 className="text-3xl font-extrabold text-gray-900 font-sans tracking-tight">
               Create Your Eco Account
@@ -124,8 +127,10 @@ const RegisterPage = () => {
             </Link>
           </div>
         </div>
+        </Reveal>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

@@ -1,0 +1,60 @@
+.profile-page {
+  position: relative;
+  color: #eafff5;
+}
+
+.profile-page > .grid > div > div,
+.profile-page > .grid > div > .bg-white {
+  border-color: rgba(140, 242, 192, 0.14) !important;
+  background: linear-gradient(145deg, rgba(16, 45, 42, 0.96), rgba(11, 36, 37, 0.94)) !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18), inset 0 1px rgba(140, 242, 192, 0.04);
+}
+
+.profile-page .bg-gray-50 {
+  background: rgba(7, 27, 28, 0.64) !important;
+}
+
+.profile-page button:not(:disabled) {
+  transition: transform 0.28s ease, border-color 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
+}
+
+.profile-page button:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.profile-page .border-emerald-500 {
+  border-color: #55d99d !important;
+  box-shadow: 0 0 0 3px rgba(140, 242, 192, 0.09), 0 10px 24px rgba(0, 0, 0, 0.14);
+}
+
+.profile-page .text-red-900,
+.profile-page .text-red-700\/70 {
+  color: #ffc1bd !important;
+}
+
+.profile-page .bg-red-50\/40 {
+  background: rgba(148, 48, 55, 0.16) !important;
+}
+
+.profile-page .border-red-100,
+.profile-page .border-red-200 {
+  border-color: rgba(255, 145, 139, 0.3) !important;
+}
+
+.profile-page .bg-gray-200 {
+  background: #294740 !important;
+  color: #c0d9ce !important;
+}
+
+.profile-page input {
+  background: #0d2525 !important;
+  color: #eafff5 !important;
+  border-color: rgba(140, 242, 192, 0.2) !important;
+}
+
+@media (max-width: 640px) {
+  .profile-page {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+}

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
+import AnimatedPage, { Reveal } from "../../componentes/common/AnimatedPage";
 import { FaUser, FaTrophy, FaRedo, FaEdit, FaCheck, FaLock } from "react-icons/fa";
+import "./ProfilePage.css";
 
 const ALL_BADGES = [
   { name: "First Step", desc: "Created a GreenPlus account to start the green journey.", icon: "🌱" },
@@ -58,10 +60,12 @@ const ProfilePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-28 pb-16 px-6 md:px-12 max-w-7xl mx-auto font-sans">
+    <AnimatedPage className="profile-motion-page">
+      <div className="profile-page min-h-screen bg-gray-50 pt-28 pb-16 px-6 md:px-12 max-w-7xl mx-auto font-sans">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Side: Mascot Avatar & Outfits Customizer (Duolingo Style) */}
-        <div className="lg:col-span-5 bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
+        <Reveal className="lg:col-span-5" direction="left">
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
           <h3 className="text-xl font-bold text-gray-900 self-start mb-4 flex items-center gap-2">
             <span className="text-emerald-500">👾</span> Leafy's Wardrobe
           </h3>
@@ -104,9 +108,10 @@ const ProfilePage = () => {
             })}
           </div>
         </div>
+        </Reveal>
 
         {/* Right Side: Account Statistics & Achievement Badges (Apple + Notion Style) */}
-        <div className="lg:col-span-7 space-y-8">
+        <Reveal className="lg:col-span-7 space-y-8" direction="right" delay={0.08}>
           {/* User Profile Card */}
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -253,9 +258,10 @@ const ProfilePage = () => {
               </button>
             )}
           </div>
-        </div>
+        </Reveal>
       </div>
-    </div>
+      </div>
+    </AnimatedPage>
   );
 };
 

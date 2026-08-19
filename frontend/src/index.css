@@ -14,14 +14,17 @@
   }
 }
 
-/* Theme variables: Navy blue, Green, Cream */
+/* Shared palette: deep teal, mint, warm amber, and soft green-white surfaces */
 :root {
-  --color-navy: #0b2740; /* deep navy */
-  --color-green: #0fa26a; /* vibrant green */
-  --color-cream: #f6f3ea; /* soft cream background */
-  --color-cream-2: #fffdf8; /* lighter cream */
-  --color-muted: #9ca3af; /* muted text */
-  --color-border: #e9e6dd; /* subtle border */
+  --color-navy: #102d2a;
+  --color-green: #0f8f67;
+  --color-mint: #8cf2c0;
+  --color-mint-soft: #e8faf1;
+  --color-amber: #efbc50;
+  --color-cream: #071b1c;
+  --color-cream-2: #102d2a;
+  --color-muted: #8daea3;
+  --color-border: rgba(140, 242, 192, 0.14);
 }
 
 /* Global theme overrides for commonly used utility classes (cascade-based)
@@ -31,13 +34,16 @@
 
 /* Page background and primary surfaces */
 body, .min-h-screen {
-  background-color: var(--color-cream) !important;
-  color: var(--color-navy) !important;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(62, 183, 139, 0.16), transparent 24rem),
+    linear-gradient(145deg, #071b1c 0%, #0b2425 58%, #102d2a 100%) !important;
+  color: #eafff5 !important;
 }
 
 /* White card surfaces -> cream */
 .bg-white {
-  background-color: var(--color-cream-2) !important;
+  background-color: #102d2a !important;
+  color: #eafff5 !important;
 }
 
 /* Dark sidebar / header -> navy */
@@ -48,12 +54,46 @@ body, .min-h-screen {
   color: var(--color-cream) !important;
 }
 
+.bg-slate-950,
+.bg-gray-900 {
+  background-color: #071b1c !important;
+  color: var(--color-cream-2) !important;
+}
+
 /* Light slate backgrounds -> subtle cream variants */
 .bg-slate-50,
 .bg-slate-100,
 .bg-slate-50\/50,
 .bg-slate-50\/30 {
-  background-color: var(--color-cream) !important;
+  background-color: #0b2425 !important;
+}
+
+.bg-gray-50,
+.bg-gray-50\/40,
+.bg-blue-50\/40 {
+  background-color: #0b2425 !important;
+}
+
+.bg-gray-100,
+.bg-slate-200 {
+  background-color: #173b37 !important;
+}
+
+.bg-blue-50,
+.bg-blue-50\/10 {
+  background-color: rgba(140, 242, 192, 0.1) !important;
+}
+
+.bg-amber-50,
+.bg-amber-50\/50 {
+  background-color: rgba(239, 188, 80, 0.12) !important;
+}
+
+.bg-emerald-50,
+.bg-emerald-50\/50,
+.bg-emerald-50\/30,
+.bg-emerald-100 {
+  background-color: rgba(140, 242, 192, 0.1) !important;
 }
 
 /* Primary text colors */
@@ -61,14 +101,56 @@ body, .min-h-screen {
 .text-gray-900,
 .text-slate-800,
 .text-slate-700 {
-  color: var(--color-navy) !important;
+  color: #eafff5 !important;
+}
+
+.text-gray-800,
+.text-gray-700,
+.text-gray-600,
+.text-gray-500,
+.text-slate-600,
+.text-slate-500 {
+  color: #b8d3c8 !important;
+}
+
+.text-blue-950,
+.text-blue-700,
+.text-blue-600,
+.text-blue-500 {
+  color: #9af5ca !important;
+}
+
+.text-amber-800,
+.text-amber-700,
+.text-amber-600,
+.text-amber-500,
+.text-amber-400 {
+  color: #ffd477 !important;
+}
+
+.text-emerald-800,
+.text-emerald-950 {
+  color: #eafff5 !important;
+}
+
+.text-emerald-700,
+.text-emerald-600,
+.text-emerald-500,
+.text-emerald-400 {
+  color: #8cf2c0 !important;
 }
 
 /* Muted text on dark backgrounds */
 .text-slate-300,
 .text-slate-400,
 .text-gray-400 {
-  color: var(--color-cream-2) !important;
+  color: #8daea3 !important;
+}
+
+.dashboard-sidebar .text-slate-300,
+.dashboard-sidebar .text-slate-400,
+.dashboard-sidebar .text-slate-500 {
+  color: rgba(211, 232, 225, 0.67) !important;
 }
 
 /* Borders */
@@ -95,6 +177,42 @@ body, .min-h-screen {
   border-color: color-mix(in srgb, var(--color-green) 15%, white) !important;
 }
 
+.border-blue-100,
+.border-blue-200,
+.border-blue-300 {
+  border-color: color-mix(in srgb, var(--color-green) 19%, white) !important;
+}
+
+.border-amber-100,
+.border-amber-200 {
+  border-color: color-mix(in srgb, var(--color-amber) 32%, white) !important;
+}
+
+.border-gray-200,
+.border-gray-300 {
+  border-color: var(--color-border) !important;
+}
+
+.bg-blue-500,
+.bg-blue-600 {
+  background-color: var(--color-green) !important;
+}
+
+.bg-amber-400,
+.bg-amber-500,
+.bg-amber-600 {
+  background-color: var(--color-amber) !important;
+}
+
+.bg-emerald-400 {
+  background-color: var(--color-mint) !important;
+}
+
+.text-emerald-500,
+.text-emerald-400 {
+  color: var(--color-green) !important;
+}
+
 /* Buttons and callouts that used blue highlights -> use green shadows */
 .shadow-\[0_4px_0_0_\#93c5fd\], .shadow-\[0_4px_0_0_\#d97706\] {
   box-shadow: 0 4px 0 0 color-mix(in srgb, var(--color-green) 35%, #0000) !important;
@@ -102,8 +220,8 @@ body, .min-h-screen {
 
 /* Ensure inputs and panels remain readable */
 input, textarea, select {
-  background-color: white;
-  color: var(--color-navy);
+  background-color: #0d2525;
+  color: #eafff5;
   border-color: var(--color-border);
 }
 
@@ -114,16 +232,16 @@ input, textarea, select {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f3f4f6;
+  background: #071b1c;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #286354;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: var(--color-green);
 }
 
 /* Apple transitions */

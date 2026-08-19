@@ -3,6 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
 import TeslaChart from "../../componentes/ui/TeslaChart";
 import Mascot from "../../componentes/common/Mascot";
+import AnimatedPage from "../../componentes/common/AnimatedPage";
+import "./Dashboard.css";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaBars,
@@ -211,13 +213,14 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 flex font-sans pt-16">
+    <AnimatedPage className="dashboard-motion-page">
+      <div className="min-h-screen bg-slate-50/50 flex font-sans pt-16">
       {/* Notion-style Left Sidebar (Charcoal gray matching Tesla / Notion aesthetics) */}
       <motion.aside
         animate={{ width: sidebarOpen ? 260 : 0 }}
-        className="bg-slate-900 text-slate-300 border-r border-slate-800 overflow-hidden flex flex-col shrink-0 z-40"
+        className="dashboard-sidebar bg-slate-900 text-slate-300 border-r border-slate-800 overflow-hidden flex flex-col shrink-0 z-40"
       >
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="dashboard-sidebar__header p-5 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">🌿</span>
             <span className="font-extrabold text-white text-sm tracking-wide font-sans">GreenPlus Space</span>
@@ -228,64 +231,78 @@ const Dashboard = () => {
         <nav className="flex-1 p-3 space-y-1">
           <div className="text-[10px] uppercase font-bold text-slate-500 px-3 mb-2 tracking-wider">WORKSPACE</div>
           <button
+            aria-current={activeTab === "overview" ? "page" : undefined}
             onClick={() => setActiveTab("overview")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+            className={`dashboard-nav-button w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
               activeTab === "overview" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
-            <span>📊</span> Overview
+            <span className="dashboard-nav-icon">📊</span><span className="dashboard-nav-label">Overview</span>
+            {activeTab === "overview" && <motion.span layoutId="dashboard-active-nav" className="dashboard-nav-active" />}
           </button>
           <button
+            aria-current={activeTab === "energy" ? "page" : undefined}
             onClick={() => setActiveTab("energy")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+            className={`dashboard-nav-button w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
               activeTab === "energy" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
-            <span>⚡</span> Energy Tracker
+            <span className="dashboard-nav-icon">⚡</span><span className="dashboard-nav-label">Energy Tracker</span>
+            {activeTab === "energy" && <motion.span layoutId="dashboard-active-nav" className="dashboard-nav-active" />}
           </button>
           <button
+            aria-current={activeTab === "water" ? "page" : undefined}
             onClick={() => setActiveTab("water")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+            className={`dashboard-nav-button w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
               activeTab === "water" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
-            <span>💧</span> Water Tracker
+            <span className="dashboard-nav-icon">💧</span><span className="dashboard-nav-label">Water Tracker</span>
+            {activeTab === "water" && <motion.span layoutId="dashboard-active-nav" className="dashboard-nav-active" />}
           </button>
           <button
+            aria-current={activeTab === "learning" ? "page" : undefined}
             onClick={() => setActiveTab("learning")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+            className={`dashboard-nav-button w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
               activeTab === "learning" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
-            <span>🎓</span> Learning Center
+            <span className="dashboard-nav-icon">🎓</span><span className="dashboard-nav-label">Learning Center</span>
+            {activeTab === "learning" && <motion.span layoutId="dashboard-active-nav" className="dashboard-nav-active" />}
           </button>
           <button
+            aria-current={activeTab === "schemes" ? "page" : undefined}
             onClick={() => setActiveTab("schemes")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+            className={`dashboard-nav-button w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
               activeTab === "schemes" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
-            <span>🏛️</span> Green Schemes
+            <span className="dashboard-nav-icon">🏛️</span><span className="dashboard-nav-label">Green Schemes</span>
+            {activeTab === "schemes" && <motion.span layoutId="dashboard-active-nav" className="dashboard-nav-active" />}
           </button>
           <button
+            aria-current={activeTab === "ai" ? "page" : undefined}
             onClick={() => setActiveTab("ai")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+            className={`dashboard-nav-button w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
               activeTab === "ai" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
-            <span>🤖</span> AI Assistant
+            <span className="dashboard-nav-icon">🤖</span><span className="dashboard-nav-label">AI Assistant</span>
+            {activeTab === "ai" && <motion.span layoutId="dashboard-active-nav" className="dashboard-nav-active" />}
           </button>
           <button
+            aria-current={activeTab === "leaderboard" ? "page" : undefined}
             onClick={() => setActiveTab("leaderboard")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+            className={`dashboard-nav-button w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
               activeTab === "leaderboard" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
             }`}
           >
-            <span>🏆</span> Leaderboard
+            <span className="dashboard-nav-icon">🏆</span><span className="dashboard-nav-label">Leaderboard</span>
+            {activeTab === "leaderboard" && <motion.span layoutId="dashboard-active-nav" className="dashboard-nav-active" />}
           </button>
         </nav>
 
-        <div className="p-4 border-t border-slate-800 bg-slate-900/60">
+        <div className="dashboard-sidebar__footer p-4 border-t border-slate-800 bg-slate-900/60">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Cloud Synced</span>
@@ -313,6 +330,23 @@ const Dashboard = () => {
           </div>
         </div>
 
+        <motion.div
+          className="dashboard-command-strip"
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="command-strip__pulse"><span /> SYSTEM LIVE</div>
+          <div className="command-strip__message">
+            <strong>Good progress, {user.name}.</strong>
+            <span>{dailyTasks.filter((task) => task.completed).length} of {dailyTasks.length} daily actions complete</span>
+          </div>
+          <div className="command-strip__metrics">
+            <span><strong>{user.xp}</strong> XP</span>
+            <span><strong>{user.streak}</strong> day streak</span>
+          </div>
+        </motion.div>
+
         {/* Level Up Banner Overlay */}
         <AnimatePresence>
           {levelUpMessage && (
@@ -339,6 +373,15 @@ const Dashboard = () => {
           )}
         </AnimatePresence>
 
+        <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          className="dashboard-tab-stage"
+          initial={{ opacity: 0, y: 14, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+          transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+        >
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === "overview" && (
           <div className="space-y-8 animate-fadeIn">
@@ -1246,8 +1289,11 @@ const Dashboard = () => {
             </div>
           )}
         </AnimatePresence>
+        </motion.div>
+        </AnimatePresence>
       </main>
-    </div>
+      </div>
+    </AnimatedPage>
   );
 };
 

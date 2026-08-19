@@ -11,11 +11,12 @@
 
     padding: 18px 8%;
 
-    background: rgba(255,255,255,0.12);
+    background: rgba(7, 27, 28, 0.86);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
 
-    border-bottom: 1px solid rgba(255,255,255,0.15);
+    border-bottom: 1px solid rgba(140, 242, 192, 0.14);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
 }
 
 /* Logo */
@@ -27,7 +28,7 @@
 
     font-size:1.6rem;
     font-weight:700;
-    color:#1fa84f;
+    color:#0f8f67;
     cursor:pointer;
 }
 
@@ -50,7 +51,7 @@
 
 .nav-links a{
     text-decoration:none;
-    color:#222;
+    color:#eafff5;
     font-weight:500;
     transition:.3s;
     position:relative;
@@ -64,12 +65,12 @@
 
     width:0%;
     height:2px;
-    background:#22c55e;
+    background:#8cf2c0;
     transition:.35s;
 }
 
 .nav-links a:hover{
-    color:#22c55e;
+    color:#0f8f67;
 }
 
 .nav-links a:hover::after{
@@ -94,26 +95,26 @@
 }
 
 .login-btn{
-    background:white;
-    color:#22c55e;
-    border:2px solid #22c55e;
+    background:#102d2a;
+    color:#8cf2c0;
+    border:2px solid #0f8f67;
 }
 
 .login-btn:hover{
-    background:#22c55e;
+    background:#0f8f67;
     color:white;
     transform:translateY(-2px);
 }
 
 .start-btn{
-    background:linear-gradient(135deg,#22c55e,#16a34a);
+    background:linear-gradient(135deg,#0f8f67,#145a4c);
     color:white;
-    box-shadow:0 10px 20px rgba(34,197,94,.3);
+    box-shadow:0 10px 20px rgba(15,143,103,.25);
 }
 
 .start-btn:hover{
     transform:translateY(-3px) scale(1.05);
-    box-shadow:0 15px 30px rgba(34,197,94,.45);
+    box-shadow:0 15px 30px rgba(15,143,103,.38);
 }
 
 /* Mobile Icon */
@@ -122,7 +123,7 @@
     display:none;
     font-size:1.5rem;
     cursor:pointer;
-    color:#22c55e;
+    color:#0f8f67;
 }
 
 /* Responsive */
