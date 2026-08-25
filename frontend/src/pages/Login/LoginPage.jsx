@@ -3,7 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
 import { motion } from "framer-motion";
-import AnimatedPage, { Reveal } from "../../componentes/common/AnimatedPage";
+import AnimatedPage from "../../componentes/common/AnimatedPage";
+import "../Auth/AuthPage.css";
 
 const LoginPage = () => {
   const { setUser } = useEco();
@@ -25,40 +26,26 @@ const LoginPage = () => {
 
   return (
     <AnimatedPage className="auth-motion-page">
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background design accents - clean but modern */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-100/50 filter blur-3xl -z-10"></div>
-      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-blue-100/40 filter blur-3xl -z-10"></div>
-
-      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        {/* Left Side: Friendly Mascot Interaction (Duolingo Style) */}
-        <Reveal className="lg:col-span-5 flex flex-col items-center justify-center text-center lg:text-left" direction="left">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Mascot
-              mood="happy"
-              speechText="Welcome back, champion! Log in to feed my roots and extend your eco-streak today! 🌿⚡"
-            />
-          </motion.div>
-        </Reveal>
-
-        {/* Right Side: Elegant Form (Apple Style) */}
-        <Reveal className="lg:col-span-7" direction="right" delay={0.12}>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-8 md:p-12">
-          <div className="mb-8">
-            <h2 className="text-3xl font-extrabold text-gray-900 font-sans tracking-tight">
-              Sign In to GreenPlus
-            </h2>
-            <p className="text-gray-500 mt-2">
-              Track carbon credits, earn badges, and join local schemes.
-            </p>
+    <div className="auth-page auth-scene auth-scene--login min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+      <div className="auth-orb auth-orb--mint"></div>
+      <div className="auth-orb auth-orb--blue"></div>
+      <div className="auth-starfield" aria-hidden="true"></div>
+      <div className="auth-light-bars" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /></div>
+      <div className="auth-floor-grid" aria-hidden="true"></div>
+      <div className="auth-brand-mark"><span>✦</span> GREENPLUS <small>ENVIRONMENTAL CONTROL</small></div>
+      <Link to="/" className="auth-home-link">← Return to home</Link>
+      <div className="auth-leafy auth-leafy--login">
+        <Mascot mood="happy" speechText="Welcome back! Ready to grow your eco-streak?" />
+      </div>
+      <div className="auth-form-panel auth-card">
+          <div className="auth-form-heading mb-8">
+            <span className="auth-card__eyebrow">WELCOME BACK</span>
+            <h2>Sign in</h2>
+            <p>Continue your journey toward a lighter footprint.</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
+          <form onSubmit={handleLogin} className="auth-form space-y-6">
+            <div className="auth-field">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Your Eco Name (Display Name)
               </label>
@@ -72,7 +59,7 @@ const LoginPage = () => {
               />
             </div>
 
-            <div>
+            <div className="auth-field">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Email Address
               </label>
@@ -86,7 +73,7 @@ const LoginPage = () => {
               />
             </div>
 
-            <div>
+            <div className="auth-field">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Password
               </label>
@@ -118,7 +105,7 @@ const LoginPage = () => {
               whileHover={{ scale: 1.01, y: -1 }}
               whileTap={{ scale: 0.99, y: 1 }}
               type="submit"
-              className="w-full py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-[0_4px_0_0_#059669] hover:bg-emerald-400 active:shadow-none active:translate-y-1 transition-all text-center tracking-wide"
+              className="auth-submit w-full py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-[0_4px_0_0_#059669] hover:bg-emerald-400 active:shadow-none active:translate-y-1 transition-all text-center tracking-wide"
             >
               Sign In
             </motion.button>
@@ -131,9 +118,7 @@ const LoginPage = () => {
             </Link>
           </div>
         </div>
-        </Reveal>
       </div>
-    </div>
     </AnimatedPage>
   );
 };

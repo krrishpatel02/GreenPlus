@@ -43,38 +43,38 @@ const TeslaChart = ({ type = "energy", dataLogs = [] }) => {
           {
             label: "Solar Generation (kWh)",
             data: solarData,
-            borderColor: "#10b981", // Emerald Green
+            borderColor: "#8cf2c0",
             backgroundColor: (context) => {
               const ctx = context.chart.ctx;
               const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-              gradient.addColorStop(0, "rgba(16, 185, 129, 0.4)");
-              gradient.addColorStop(1, "rgba(16, 185, 129, 0.0)");
+              gradient.addColorStop(0, "rgba(140, 242, 192, 0.42)");
+              gradient.addColorStop(1, "rgba(140, 242, 192, 0.0)");
               return gradient;
             },
             fill: true,
             tension: 0.4,
             borderWidth: 3,
-            pointBackgroundColor: "#10b981",
+            pointBackgroundColor: "#8cf2c0",
             pointHoverRadius: 7,
-            shadowColor: "rgba(16, 185, 129, 0.5)",
+            shadowColor: "rgba(15, 143, 103, 0.5)",
             shadowBlur: 10,
           },
           {
             label: "Grid Consumption (kWh)",
             data: gridData,
-            borderColor: "#eab308", // Energy Yellow
+            borderColor: "#57bdff",
             backgroundColor: (context) => {
               const ctx = context.chart.ctx;
               const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-              gradient.addColorStop(0, "rgba(234, 179, 8, 0.2)");
-              gradient.addColorStop(1, "rgba(234, 179, 8, 0.0)");
+              gradient.addColorStop(0, "rgba(87, 189, 255, 0.24)");
+              gradient.addColorStop(1, "rgba(87, 189, 255, 0.0)");
               return gradient;
             },
             fill: true,
             tension: 0.4,
             borderWidth: 2,
             borderDash: [5, 5],
-            pointBackgroundColor: "#eab308",
+            pointBackgroundColor: "#57bdff",
             pointHoverRadius: 5,
           },
         ],
@@ -90,35 +90,35 @@ const TeslaChart = ({ type = "energy", dataLogs = [] }) => {
           {
             label: "Water Saved (Liters)",
             data: savedData,
-            borderColor: "#3b82f6", // Water Blue
+            borderColor: "#57bdff",
             backgroundColor: (context) => {
               const ctx = context.chart.ctx;
               const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-              gradient.addColorStop(0, "rgba(59, 130, 246, 0.4)");
-              gradient.addColorStop(1, "rgba(59, 130, 246, 0.0)");
+              gradient.addColorStop(0, "rgba(87, 189, 255, 0.42)");
+              gradient.addColorStop(1, "rgba(87, 189, 255, 0.0)");
               return gradient;
             },
             fill: true,
             tension: 0.4,
             borderWidth: 3,
-            pointBackgroundColor: "#3b82f6",
+            pointBackgroundColor: "#57bdff",
             pointHoverRadius: 7,
           },
           {
             label: "Water Used (Liters)",
             data: usedData,
-            borderColor: "#9ca3af", // Slate Gray
+            borderColor: "#8cf2c0",
             backgroundColor: (context) => {
               const ctx = context.chart.ctx;
               const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-              gradient.addColorStop(0, "rgba(156, 163, 175, 0.2)");
-              gradient.addColorStop(1, "rgba(156, 163, 175, 0.0)");
+              gradient.addColorStop(0, "rgba(140, 242, 192, 0.2)");
+              gradient.addColorStop(1, "rgba(140, 242, 192, 0.0)");
               return gradient;
             },
             fill: true,
             tension: 0.4,
             borderWidth: 2,
-            pointBackgroundColor: "#9ca3af",
+            pointBackgroundColor: "#8cf2c0",
             pointHoverRadius: 5,
           },
         ],

@@ -33,6 +33,11 @@ const AnimatedPage = ({ children, className = "" }) => {
         <span className="atmosphere-shape atmosphere-shape-one" />
         <span className="atmosphere-shape atmosphere-shape-two" />
         <span className="atmosphere-grid" />
+        <motion.span
+          className="atmosphere-beam"
+          animate={{ x: ["-8%", "8%", "-8%"], opacity: [0.25, 0.5, 0.25] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        />
       </div>
       <div className="animated-page__content">{children}</div>
     </div>

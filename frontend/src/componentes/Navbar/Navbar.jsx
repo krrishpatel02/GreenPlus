@@ -2,13 +2,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
 import "./Navbar.css";
 import { FaLeaf, FaBars } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 function Navbar() {
   const { user } = useEco();
   const navigate = useNavigate();
 
   return (
-    <nav className="navbar">
+    <motion.nav
+      className="navbar"
+      initial={{ opacity: 0, y: -18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+    >
       <div className="logo" onClick={() => navigate("/")}>
         <FaLeaf className="logo-icon" />
         <span>GreenPlus</span>
@@ -38,7 +44,7 @@ function Navbar() {
       <div className="menu-icon">
         <FaBars />
       </div>
-    </nav>
+    </motion.nav>
   );
 }
 

@@ -67,11 +67,34 @@
   mask-image: linear-gradient(to bottom, black, transparent 70%);
 }
 
+.atmosphere-beam {
+  position: absolute;
+  top: 18%;
+  left: 20%;
+  display: block;
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(140, 242, 192, 0.55), rgba(239, 188, 80, 0.4), transparent);
+  box-shadow: 0 0 34px 8px rgba(140, 242, 192, 0.08);
+  transform: rotate(-9deg);
+}
+
+.animated-page button,
+.animated-page a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.animated-page button:not(:disabled):hover,
+.animated-page a:hover {
+  filter: brightness(1.08);
+}
+
 @keyframes shape-float {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
   50% { transform: translate3d(-18px, 28px, 0) rotate(14deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .atmosphere-shape { animation: none; }
+  .atmosphere-shape,
+  .atmosphere-beam { animation: none; transform: none; }
 }

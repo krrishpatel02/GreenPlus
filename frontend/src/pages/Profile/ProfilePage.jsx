@@ -1,15 +1,15 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
-import AnimatedPage, { Reveal } from "../../componentes/common/AnimatedPage";
+import { motion } from "framer-motion";
 import { FaUser, FaTrophy, FaRedo, FaEdit, FaCheck, FaLock } from "react-icons/fa";
-import "./ProfilePage.css";
 
 const ALL_BADGES = [
   { name: "First Step", desc: "Created a GreenPlus account to start the green journey.", icon: "🌱" },
   { name: "Solar Pioneer", desc: "Generated over 10 kWh of solar energy in a single day.", icon: "☀️" },
   { name: "Water Wizard", desc: "Cumulative water savings reached 150 liters.", icon: "💧" },
-  { name: "Quiz Master", desc: "Completed all 3 core environmental quizzes.", icon: "🧠" },
+  { name: "Methane Mitigation Master", desc: "Avoided over 4.0 kg CH4 emissions via dietary & organic waste choices.", icon: "🐮" },
+  { name: "Rio Trio Scholar", desc: "Mastered UNFCCC Climate, CBD Biodiversity, and UNCCD Land quizzes.", icon: "🌍" },
   { name: "Streak Master", desc: "Maintained a daily tracking streak of 5+ days.", icon: "🔥" },
 ];
 
@@ -60,18 +60,16 @@ const ProfilePage = () => {
   ];
 
   return (
-    <AnimatedPage className="profile-motion-page">
-      <div className="profile-page min-h-screen bg-gray-50 pt-28 pb-16 px-6 md:px-12 max-w-7xl mx-auto font-sans">
+    <div className="min-h-screen bg-slate-50/50 pt-28 pb-16 px-6 md:px-12 max-w-7xl mx-auto font-sans">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Side: Mascot Avatar & Outfits Customizer (Duolingo Style) */}
-        <Reveal className="lg:col-span-5" direction="left">
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
-          <h3 className="text-xl font-bold text-gray-900 self-start mb-4 flex items-center gap-2">
+        {/* Left Side: Mascot Avatar & Outfits Customizer */}
+        <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col items-center">
+          <h3 className="text-xl font-bold text-slate-900 self-start mb-4 flex items-center gap-2">
             <span className="text-emerald-500">👾</span> Leafy's Wardrobe
           </h3>
           
-          <div className="w-full flex justify-center bg-gray-50 rounded-2xl p-4 border border-gray-100 mb-6">
-            <Mascot mood="happy" outfit={user.leafyOutfit} speechText="Pick an outfit! Unlocking badges gets me cool hats! 🎩" />
+          <div className="w-full flex justify-center bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6">
+            <Mascot mood="happy" outfit={user.leafyOutfit} speechText="Pick an outfit! Unlocking research badges gets me cool hats! 🎩" />
           </div>
 
           <div className="w-full space-y-3">
@@ -88,19 +86,19 @@ const ProfilePage = () => {
                     active
                       ? "border-emerald-500 bg-emerald-50/50"
                       : unlocked
-                      ? "border-gray-100 hover:border-emerald-200 cursor-pointer"
-                      : "border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed"
+                      ? "border-slate-100 hover:border-emerald-200 cursor-pointer"
+                      : "border-slate-100 bg-slate-50 opacity-60 cursor-not-allowed"
                   }`}
                 >
                   <div className="flex-1 pr-4">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-gray-900 text-sm">{outfit.name}</span>
-                      {!unlocked && <FaLock className="text-xs text-gray-400" />}
+                      <span className="font-bold text-slate-900 text-sm">{outfit.name}</span>
+                      {!unlocked && <FaLock className="text-xs text-slate-400" />}
                       {active && <span className="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">Active</span>}
                     </div>
-                    <span className="text-xs text-gray-400 block mt-0.5">{outfit.desc}</span>
+                    <span className="text-xs text-slate-400 block mt-0.5">{outfit.desc}</span>
                   </div>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${unlocked ? "bg-emerald-50 text-emerald-700" : "bg-gray-200 text-gray-600"}`}>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${unlocked ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-600"}`}>
                     {getOutfitUnlockCondition(outfit.id)}
                   </span>
                 </button>
@@ -108,12 +106,11 @@ const ProfilePage = () => {
             })}
           </div>
         </div>
-        </Reveal>
 
-        {/* Right Side: Account Statistics & Achievement Badges (Apple + Notion Style) */}
-        <Reveal className="lg:col-span-7 space-y-8" direction="right" delay={0.08}>
+        {/* Right Side: Account Statistics & Achievement Badges */}
+        <div className="lg:col-span-7 space-y-8">
           {/* User Profile Card */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl font-bold">
@@ -126,7 +123,7 @@ const ProfilePage = () => {
                         type="text"
                         value={tempName}
                         onChange={(e) => setTempName(e.target.value)}
-                        className="px-3 py-1.5 border border-gray-200 rounded-lg text-lg font-bold text-gray-800 focus:outline-none focus:border-emerald-500"
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-lg font-bold text-slate-800 focus:outline-none focus:border-emerald-500"
                       />
                       <button onClick={handleSaveName} className="p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition">
                         <FaCheck />
@@ -134,13 +131,13 @@ const ProfilePage = () => {
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">{user.name}</h2>
-                      <button onClick={() => setEditingName(true)} className="text-gray-400 hover:text-gray-600 p-1">
+                      <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">{user.name}</h2>
+                      <button onClick={() => setEditingName(true)} className="text-slate-400 hover:text-slate-600 p-1">
                         <FaEdit />
                       </button>
                     </div>
                   )}
-                  <span className="text-xs text-gray-400 font-semibold block mt-0.5">Eco Champion Profile</span>
+                  <span className="text-xs text-slate-400 font-semibold block mt-0.5">Eco Champion Profile</span>
                 </div>
               </div>
 
@@ -164,13 +161,13 @@ const ProfilePage = () => {
 
             {/* XP progress bar */}
             <div>
-              <div className="flex justify-between items-center text-xs font-semibold text-gray-500 mb-2">
+              <div className="flex justify-between items-center text-xs font-semibold text-slate-500 mb-2">
                 <span>XP Progress</span>
                 <span>{user.xp} / {user.xpToNextLevel} XP</span>
               </div>
-              <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-full rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
                   style={{ width: `${(user.xp / user.xpToNextLevel) * 100}%` }}
                 ></div>
               </div>
@@ -178,9 +175,9 @@ const ProfilePage = () => {
           </div>
 
           {/* Badges Showcase */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
-            <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <FaTrophy className="text-amber-500" /> Trophies & Badges
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
+            <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+              <FaTrophy className="text-amber-500" /> Research Trophies & Badges
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -193,26 +190,26 @@ const ProfilePage = () => {
                     className={`p-4 rounded-2xl border transition-all flex items-start gap-4 ${
                       unlocked
                         ? "bg-white border-emerald-100 shadow-sm"
-                        : "bg-gray-50 border-gray-100 opacity-60"
+                        : "bg-slate-50 border-slate-100 opacity-60"
                     }`}
                   >
                     <div
                       className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl filter drop-shadow-sm ${
-                        unlocked ? "bg-emerald-50" : "bg-gray-200 grayscale"
+                        unlocked ? "bg-emerald-50" : "bg-slate-200 grayscale"
                       }`}
                     >
                       {badge.icon}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-gray-900 text-sm">{badge.name}</span>
+                        <span className="font-bold text-slate-900 text-sm">{badge.name}</span>
                         {unlocked ? (
                           <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-1.5 py-0.2 rounded">Unlocked</span>
                         ) : (
-                          <span className="text-[10px] bg-gray-200 text-gray-600 font-extrabold px-1.5 py-0.2 rounded">Locked</span>
+                          <span className="text-[10px] bg-slate-200 text-slate-600 font-extrabold px-1.5 py-0.2 rounded">Locked</span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-400 mt-1 leading-relaxed">{badge.desc}</p>
+                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">{badge.desc}</p>
                     </div>
                   </div>
                 );
@@ -224,10 +221,10 @@ const ProfilePage = () => {
           <div className="bg-red-50/40 border border-red-100 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h4 className="font-bold text-red-900 text-sm flex items-center gap-1.5">
-                <FaRedo className="text-red-500" /> Danger Zone
+                <FaRedo className="text-red-500" /> Reset Profile Progress
               </h4>
               <p className="text-xs text-red-700/70 mt-1">
-                Resetting deletes all logged water/energy charts and restarts levels at 1.
+                Resetting clears logs and restarts levels at 1.
               </p>
             </div>
 
@@ -244,7 +241,7 @@ const ProfilePage = () => {
                 </button>
                 <button
                   onClick={() => setResetConfirm(false)}
-                  className="flex-1 sm:flex-none px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer"
+                  className="flex-1 sm:flex-none px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -258,10 +255,9 @@ const ProfilePage = () => {
               </button>
             )}
           </div>
-        </Reveal>
+        </div>
       </div>
-      </div>
-    </AnimatedPage>
+    </div>
   );
 };
 

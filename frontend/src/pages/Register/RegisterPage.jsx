@@ -3,7 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
 import { motion } from "framer-motion";
-import AnimatedPage, { Reveal } from "../../componentes/common/AnimatedPage";
+import AnimatedPage from "../../componentes/common/AnimatedPage";
+import "../Auth/AuthPage.css";
 
 const RegisterPage = () => {
   const { setUser } = useEco();
@@ -24,40 +25,26 @@ const RegisterPage = () => {
 
   return (
     <AnimatedPage className="auth-motion-page">
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background design accents */}
-      <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-100/50 filter blur-3xl -z-10"></div>
-      <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-yellow-100/40 filter blur-3xl -z-10"></div>
-
-      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        {/* Left Side: Friendly Mascot Interaction */}
-        <Reveal className="lg:col-span-5 flex flex-col items-center justify-center text-center lg:text-left" direction="left">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Mascot
-              mood="thinking"
-              speechText="Awesome decision! Creating an account unlocks custom badges, solar rebates, and daily carbon metrics. Let's grow together! 🌱📈"
-            />
-          </motion.div>
-        </Reveal>
-
-        {/* Right Side: Elegant Form */}
-        <Reveal className="lg:col-span-7" direction="right" delay={0.12}>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-8 md:p-12">
-          <div className="mb-8">
-            <h2 className="text-3xl font-extrabold text-gray-900 font-sans tracking-tight">
-              Create Your Eco Account
-            </h2>
-            <p className="text-gray-500 mt-2">
-              Join thousands of people reducing their energy and water footprint.
-            </p>
+    <div className="auth-page auth-scene auth-scene--register min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+      <div className="auth-orb auth-orb--mint"></div>
+      <div className="auth-orb auth-orb--blue"></div>
+      <div className="auth-starfield" aria-hidden="true"></div>
+      <div className="auth-light-bars" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /></div>
+      <div className="auth-floor-grid" aria-hidden="true"></div>
+      <div className="auth-brand-mark"><span>✦</span> GREENPLUS <small>ENVIRONMENTAL CONTROL</small></div>
+      <Link to="/" className="auth-home-link">← Return to home</Link>
+      <div className="auth-leafy auth-leafy--register">
+        <Mascot mood="thinking" speechText="Let&apos;s build your greener daily routine!" />
+      </div>
+      <div className="auth-form-panel auth-card">
+          <div className="auth-form-heading mb-8">
+            <span className="auth-card__eyebrow">NEW ECO PROFILE</span>
+            <h2>Create account</h2>
+            <p>Build your personal control room for everyday impact.</p>
           </div>
 
-          <form onSubmit={handleRegister} className="space-y-5">
-            <div>
+          <form onSubmit={handleRegister} className="auth-form space-y-5">
+            <div className="auth-field">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 What should we call you?
               </label>
@@ -71,7 +58,7 @@ const RegisterPage = () => {
               />
             </div>
 
-            <div>
+            <div className="auth-field">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Email Address
               </label>
@@ -85,7 +72,7 @@ const RegisterPage = () => {
               />
             </div>
 
-            <div>
+            <div className="auth-field">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Password
               </label>
@@ -114,7 +101,7 @@ const RegisterPage = () => {
               whileHover={{ scale: 1.01, y: -1 }}
               whileTap={{ scale: 0.99, y: 1 }}
               type="submit"
-              className="w-full py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-[0_4px_0_0_#059669] hover:bg-emerald-400 active:shadow-none active:translate-y-1 transition-all text-center tracking-wide"
+              className="auth-submit w-full py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-[0_4px_0_0_#059669] hover:bg-emerald-400 active:shadow-none active:translate-y-1 transition-all text-center tracking-wide"
             >
               Join the Green Movement
             </motion.button>
@@ -127,9 +114,7 @@ const RegisterPage = () => {
             </Link>
           </div>
         </div>
-        </Reveal>
       </div>
-    </div>
     </AnimatedPage>
   );
 };

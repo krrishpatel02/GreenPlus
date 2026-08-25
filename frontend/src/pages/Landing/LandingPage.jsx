@@ -4,7 +4,7 @@ import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
 import { Reveal } from "../../componentes/common/AnimatedPage";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaLeaf, FaBolt, FaTint, FaGraduationCap, FaChevronRight, FaArrowLeft, FaChevronLeft, FaChartLine, FaShieldAlt, FaSeedling } from "react-icons/fa";
+import { FaLeaf, FaBolt, FaTint, FaGraduationCap, FaChevronRight, FaArrowLeft, FaChevronLeft, FaChartLine } from "react-icons/fa";
 import "./LandingPage.css";
 
 const impactSlides = [
@@ -34,6 +34,12 @@ const impactSlides = [
   },
 ];
 
+const orbitSignals = [
+  { id: "energy", label: "Energy", value: "-12%", detail: "less grid reliance", icon: FaBolt, position: "energy" },
+  { id: "water", label: "Water", value: "+28L", detail: "saved this week", icon: FaTint, position: "water" },
+  { id: "habit", label: "Habits", value: "7 day", detail: "active streak", icon: FaLeaf, position: "habit" },
+];
+
 const LandingPage = () => {
   const navigate = useNavigate();
   const { addXp } = useEco();
@@ -44,6 +50,7 @@ const LandingPage = () => {
   const [energySource, setEnergySource] = useState("");
   const [recycling, setRecycling] = useState("");
   const [activeSlide, setActiveSlide] = useState(0);
+  const [activeOrbitSignal, setActiveOrbitSignal] = useState(null);
 
   useEffect(() => {
     const carouselTimer = window.setInterval(() => {
@@ -102,32 +109,56 @@ const LandingPage = () => {
     <div className="landing-page min-h-screen bg-white text-gray-900 font-sans">
       {/* Hero Section (Clean like Apple, Modern like Tesla) */}
       <section className="landing-hero relative pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto flex flex-col items-center text-center overflow-hidden">
-        {/* Abstract glowing backgrounds */}
-        <div className="hero-orbit hero-orbit-one" />
-        <div className="hero-orbit hero-orbit-two" />
-
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="max-w-4xl"
         >
-          <span className="hero-kicker inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-xs tracking-wider uppercase mb-6 border border-emerald-100">
-            <FaLeaf className="text-emerald-500 animate-spin" style={{ animationDuration: "8s" }} /> Smart Eco-Gamification
-          </span>
-          <h1 className="hero-title text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.05] mb-8 font-sans">
-            Tracking Carbon, <br />
-            <span className="bg-gradient-to-r from-emerald-600 to-emerald-400 bg-clip-text text-transparent">
-              Growing Habits.
-            </span>
-          </h1>
-          <div className="hero-signal-row" aria-label="GreenPlus capabilities">
-            <span><FaChartLine /> Live footprint</span>
-            <span><FaSeedling /> Habit streaks</span>
-            <span><FaShieldAlt /> Local rewards</span>
+          <div className="hero-brand-lockup" aria-label="GreenPlus Smart Eco-Gamification">
+            <div className="hero-brand-name">
+              <FaLeaf className="hero-brand-icon" />
+              <strong>GreenPlus</strong>
+            </div>
+            <span className="hero-kicker">Smart Eco-Gamification</span>
           </div>
+          <motion.div
+            className={`hero-orbit-dashboard ${activeOrbitSignal ? "has-selection" : ""}`}
+            initial={{ opacity: 0, scale: 0.82, rotate: -8 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ delay: 0.42, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            aria-label="Live carbon impact orbit"
+          >
+            <div className="orbit-ring orbit-ring--outer" />
+            <div className="orbit-ring orbit-ring--inner" />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeOrbitSignal?.id || "score"}
+                className="orbit-core"
+                initial={{ opacity: 0, scale: 0.82 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <span>{activeOrbitSignal ? activeOrbitSignal.label : "LIVE SCORE"}</span>
+                <strong>{activeOrbitSignal ? activeOrbitSignal.value : "82"}</strong>
+                <small>{activeOrbitSignal ? activeOrbitSignal.detail : "eco momentum"}</small>
+              </motion.div>
+            </AnimatePresence>
+            {orbitSignals.map(({ id, label, value, icon: Icon, position }) => (
+              <motion.button
+                key={id}
+                type="button"
+                className={`orbit-node orbit-node--${position} ${activeOrbitSignal?.id === id ? "is-selected" : ""}`}
+                onClick={() => setActiveOrbitSignal((current) => (current?.id === id ? null : orbitSignals.find((signal) => signal.id === id)))}
+                whileTap={{ scale: 0.94 }}
+                aria-pressed={activeOrbitSignal?.id === id}
+              >
+                <Icon /><span>{label}<br /><b>{value}</b></span>
+              </motion.button>
+            ))}
+          </motion.div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="hero-actions flex flex-col sm:flex-row gap-4 justify-center items-center">
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
@@ -210,6 +241,25 @@ const LandingPage = () => {
           Start now <FaChevronRight />
         </button>
       </motion.div>
+
+      <Reveal className="landing-orbit-section" direction="up">
+        <section className="action-orbit-section" aria-labelledby="action-orbit-title">
+          <div className="action-orbit-copy">
+            <span className="section-kicker">THE GREEN LOOP</span>
+            <h2 id="action-orbit-title">Every action moves the system.</h2>
+            <p>Log one small win and watch your personal orbit gather momentum across energy, water, and learning.</p>
+            <button onClick={() => document.getElementById("calculator-section")?.scrollIntoView({ behavior: "smooth" })}>
+              Enter your orbit <FaChevronRight />
+            </button>
+          </div>
+          <div className="action-orbit-visual" aria-hidden="true">
+            <div className="action-orbit-planet"><FaLeaf /></div>
+            <span className="action-orbit-track action-orbit-track--one"><i>⚡</i></span>
+            <span className="action-orbit-track action-orbit-track--two"><i>💧</i></span>
+            <span className="action-orbit-track action-orbit-track--three"><i>✦</i></span>
+          </div>
+        </section>
+      </Reveal>
 
       {/* Interactive Eco Calculator Section (Duolingo + Apple Style) */}
       <Reveal>

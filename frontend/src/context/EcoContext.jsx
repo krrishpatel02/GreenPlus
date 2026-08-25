@@ -1,6 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
-/* eslint-disable react-hooks/set-state-in-effect */
-import { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 const EcoContext = createContext();
 
@@ -16,6 +14,7 @@ const DEFAULT_SCHEMES = [
     status: "Open",
     difficulty: "Medium",
     desc: "Get a tax rebate of up to 30% on installations of home solar panels and battery storage equipment.",
+    sdgs: ["SDG 7: Clean Energy", "SDG 13: Climate Action"],
   },
   {
     id: "scheme-2",
@@ -26,6 +25,7 @@ const DEFAULT_SCHEMES = [
     status: "Open",
     difficulty: "Easy",
     desc: "Subsidize the purchase and installation of level-2 EV smart chargers at your home, plus special overnight electric pricing.",
+    sdgs: ["SDG 11: Sustainable Cities", "SDG 13: Climate Action"],
   },
   {
     id: "scheme-3",
@@ -36,6 +36,7 @@ const DEFAULT_SCHEMES = [
     status: "Open",
     difficulty: "Easy",
     desc: "Provides cash-back rebates for installing smart learning thermostats or energy-efficient electric heat pumps.",
+    sdgs: ["SDG 7: Clean Energy", "SDG 12: Responsible Consumption"],
   },
   {
     id: "scheme-4",
@@ -46,10 +47,119 @@ const DEFAULT_SCHEMES = [
     status: "Closing Soon",
     difficulty: "Hard",
     desc: "Provides funding for homeowners who convert water-intensive turf lawns to drought-tolerant landscaping or build collection tanks.",
+    sdgs: ["SDG 6: Clean Water", "SDG 15: Life on Land"],
   },
 ];
 
 const INITIAL_QUIZZES = [
+  // --- Module 6 & Rio Trio Education (UNFCCC, CBD, UNCCD) ---
+  {
+    id: "quiz-rio-climate",
+    title: "Rio Trio: Climate Action (UNFCCC & IPCC)",
+    category: "Rio Trio",
+    xp: 60,
+    difficulty: "Intermediate",
+    questions: [
+      {
+        question: "What is the main objective of the UNFCCC treaty adopted at the 1992 Rio Earth Summit?",
+        options: [
+          "To stabilize greenhouse gas concentrations to prevent dangerous anthropogenic climate interference",
+          "To tax international airline travel",
+          "To build offshore solar farms exclusively",
+          "To eliminate plastic bottle production by 2030",
+        ],
+        answer: 0,
+      },
+      {
+        question: "According to the IPCC AR6 Synthesis Report, what is the target global warming limit above pre-industrial levels to avoid extreme climate risks?",
+        options: ["3.0°C", "2.5°C", "1.5°C", "0.5°C"],
+        answer: 2,
+      },
+      {
+        question: "Which sector is responsible for the largest share of human-caused greenhouse gas emissions globally?",
+        options: ["Commercial aviation", "Energy & electricity production", "Residential lighting", "Waste incineration"],
+        answer: 1,
+      },
+    ],
+  },
+  {
+    id: "quiz-rio-biodiversity",
+    title: "Rio Trio: Biodiversity Protection (CBD)",
+    category: "Rio Trio",
+    xp: 60,
+    difficulty: "Intermediate",
+    questions: [
+      {
+        question: "What does the UN Convention on Biological Diversity (CBD) focus on?",
+        options: [
+          "Promoting industrial urban development",
+          "Conserving biological diversity and sustainable use of ecosystems",
+          "Managing deep sea mineral mining",
+          "Establishing global satellite communications",
+        ],
+        answer: 1,
+      },
+      {
+        question: "How does protecting natural forests and wetlands contribute to climate mitigation?",
+        options: [
+          "They act as natural carbon sinks that absorb CO2 from the atmosphere",
+          "They reflect 100% of sunlight back to space",
+          "They reduce atmospheric pressure",
+          "They stop tectonic plate movement",
+        ],
+        answer: 0,
+      },
+      {
+        question: "What is the Kunming-Montreal Global Biodiversity Framework target for land & ocean protection by 2030?",
+        options: ["10%", "30% (30x30 Target)", "50%", "75%"],
+        answer: 1,
+      },
+    ],
+  },
+  {
+    id: "quiz-rio-desertification",
+    title: "Rio Trio: Land & Desertification (UNCCD)",
+    category: "Rio Trio",
+    xp: 60,
+    difficulty: "Intermediate",
+    questions: [
+      {
+        question: "What is Land Degradation Neutrality (LDN) under the UNCCD?",
+        options: [
+          "A state where the amount and quality of land resources remains stable or increases",
+          "Banning all agricultural plowing worldwide",
+          "Converting deserts into artificial concrete cities",
+          "Paving dry soils with solar panels",
+        ],
+        answer: 0,
+      },
+      {
+        question: "Which landscaping strategy conserves water and prevents soil erosion in dry areas?",
+        options: ["Over-watering lawns daily", "Xeriscaping with native drought-tolerant plants", "Burning dead grass", "Importing tropical turf"],
+        answer: 1,
+      },
+    ],
+  },
+  {
+    id: "quiz-methane",
+    title: "Methane Model & Agricultural Impact",
+    category: "Methane",
+    xp: 60,
+    difficulty: "Advanced",
+    questions: [
+      {
+        question: "How much more potent is methane (CH4) compared to carbon dioxide (CO2) over a 20-year timescale?",
+        options: ["2 times", "10 times", "Over 80 times", "500 times"],
+        answer: 2,
+      },
+      {
+        question: "What is the primary agricultural source of human-influenced methane emissions?",
+        options: ["Enteric fermentation in ruminant livestock & food waste in landfills", "Tractor diesel fuel", "Fertilizer runoff in streams", "Solar array installation"],
+        answer: 0,
+      },
+    ],
+  },
+  // --- Original Core Quizzes ---
   {
     id: "quiz-energy",
     title: "Solar & Smart Grid Basics",
@@ -162,12 +272,13 @@ export const EcoProvider = ({ children }) => {
     xpToNextLevel: 100,
     streak: 3,
     streakClaimed: false,
-    leafyOutfit: "default", // default, solar-cap, water-goggles, gardener-hat
+    leafyOutfit: "default",
   });
 
   const [dailyTasks, setDailyTasks] = useState([
     { id: "log_energy", text: "Log electricity & solar stats today", xp: 15, completed: false },
     { id: "log_water", text: "Log water savings today", xp: 15, completed: false },
+    { id: "log_methane", text: "Log plant-based meal / organic compost (Methane Model)", xp: 20, completed: false },
     { id: "quiz", text: "Complete an Eco-Quiz to earn knowledge", xp: 30, completed: false },
   ]);
 
@@ -183,29 +294,45 @@ export const EcoProvider = ({ children }) => {
     { date: "2026-07-09", waterUsed: 210, waterSaved: 10 },
   ]);
 
+  const [methaneLogs, setMethaneLogs] = useState([
+    { date: "2026-07-07", dietChoice: "Plant-Based", ch4AvoidedKg: 1.8, compostedKg: 0.5 },
+    { date: "2026-07-08", dietChoice: "Vegetarian", ch4AvoidedKg: 1.2, compostedKg: 1.0 },
+    { date: "2026-07-09", dietChoice: "Plant-Based", ch4AvoidedKg: 1.8, compostedKg: 0.8 },
+  ]);
+
   const [completedQuizzes, setCompletedQuizzes] = useState([]);
   const [bookmarkedSchemes, setBookmarkedSchemes] = useState([]);
   const [badges, setBadges] = useState(["First Step"]);
   const [levelUpMessage, setLevelUpMessage] = useState(null);
 
-  // Auto unlock badges based on state
+  // Auto unlock research-backed badges based on state
   useEffect(() => {
     const newBadges = [...badges];
     let updated = false;
 
-    // Solar Pioneer Badge
-    if (energyLogs.some(log => log.solarEnergy > 10) && !newBadges.includes("Solar Pioneer")) {
+    // Solar Pioneer
+    if (energyLogs.some((log) => log.solarEnergy > 10) && !newBadges.includes("Solar Pioneer")) {
       newBadges.push("Solar Pioneer");
       updated = true;
     }
-    // Water Wizard Badge
+    // Water Wizard
     if (waterLogs.reduce((acc, curr) => acc + curr.waterSaved, 0) >= 150 && !newBadges.includes("Water Wizard")) {
       newBadges.push("Water Wizard");
       updated = true;
     }
-    // Quiz Master
-    if (completedQuizzes.length >= 3 && !newBadges.includes("Quiz Master")) {
-      newBadges.push("Quiz Master");
+    // Methane Mitigation Master
+    if (methaneLogs.reduce((acc, curr) => acc + curr.ch4AvoidedKg, 0) >= 4.0 && !newBadges.includes("Methane Mitigation Master")) {
+      newBadges.push("Methane Mitigation Master");
+      updated = true;
+    }
+    // Rio Trio Scholar
+    if (
+      completedQuizzes.includes("quiz-rio-climate") &&
+      completedQuizzes.includes("quiz-rio-biodiversity") &&
+      completedQuizzes.includes("quiz-rio-desertification") &&
+      !newBadges.includes("Rio Trio Scholar")
+    ) {
+      newBadges.push("Rio Trio Scholar");
       updated = true;
     }
     // Streak Master
@@ -217,7 +344,7 @@ export const EcoProvider = ({ children }) => {
     if (updated) {
       setBadges(newBadges);
     }
-  }, [energyLogs, waterLogs, completedQuizzes, user.streak]);
+  }, [energyLogs, waterLogs, methaneLogs, completedQuizzes, user.streak]);
 
   const addXp = (amount) => {
     setUser((prev) => {
@@ -234,7 +361,7 @@ export const EcoProvider = ({ children }) => {
       }
 
       if (leveledUp) {
-        setLevelUpMessage(`Congratulations! You've reached Level ${newLevel}! Leafy has got some advice for you!`);
+        setLevelUpMessage(`Congratulations! You've reached Level ${newLevel}! Leafy has unlocked new insights for you!`);
       }
 
       return {
@@ -248,25 +375,22 @@ export const EcoProvider = ({ children }) => {
 
   const addEnergyLog = (gridEnergy, solarEnergy) => {
     const date = new Date().toISOString().split("T")[0];
-    const offset = parseFloat((solarEnergy * 0.4).toFixed(2)); // 0.4kg CO2 saved per kWh of solar
+    const offset = parseFloat((solarEnergy * 0.4).toFixed(2));
     
-    // update logs
     setEnergyLogs((prev) => {
       const filtered = prev.filter((log) => log.date !== date);
       return [...filtered, { date, gridEnergy, solarEnergy, offset }];
     });
 
-    // complete task
     setDailyTasks((prev) =>
       prev.map((t) => (t.id === "log_energy" ? { ...t, completed: true } : t))
     );
 
-    // Give XP if task wasn't completed
     const task = dailyTasks.find((t) => t.id === "log_energy");
     if (task && !task.completed) {
       addXp(task.xp);
     } else {
-      addXp(5); // minor participation XP
+      addXp(5);
     }
   };
 
@@ -290,11 +414,36 @@ export const EcoProvider = ({ children }) => {
     }
   };
 
+  const addMethaneLog = (dietChoice, compostedKg) => {
+    const date = new Date().toISOString().split("T")[0];
+    let ch4AvoidedKg = 0.5;
+    if (dietChoice === "Plant-Based") ch4AvoidedKg = 1.8;
+    if (dietChoice === "Vegetarian") ch4AvoidedKg = 1.2;
+
+    ch4AvoidedKg += parseFloat((compostedKg * 0.4).toFixed(2));
+
+    setMethaneLogs((prev) => {
+      const filtered = prev.filter((log) => log.date !== date);
+      return [...filtered, { date, dietChoice, ch4AvoidedKg, compostedKg }];
+    });
+
+    setDailyTasks((prev) =>
+      prev.map((t) => (t.id === "log_methane" ? { ...t, completed: true } : t))
+    );
+
+    const task = dailyTasks.find((t) => t.id === "log_methane");
+    if (task && !task.completed) {
+      addXp(task.xp);
+    } else {
+      addXp(5);
+    }
+  };
+
   const completeQuiz = (quizId, score) => {
-    if (score >= 100) { // Passed
+    if (score >= 60) {
       if (!completedQuizzes.includes(quizId)) {
         setCompletedQuizzes((prev) => [...prev, quizId]);
-        addXp(50);
+        addXp(60);
       }
       
       setDailyTasks((prev) =>
@@ -344,10 +493,12 @@ export const EcoProvider = ({ children }) => {
     setDailyTasks([
       { id: "log_energy", text: "Log electricity & solar stats today", xp: 15, completed: false },
       { id: "log_water", text: "Log water savings today", xp: 15, completed: false },
+      { id: "log_methane", text: "Log plant-based meal / organic compost (Methane Model)", xp: 20, completed: false },
       { id: "quiz", text: "Complete an Eco-Quiz to earn knowledge", xp: 30, completed: false },
     ]);
     setEnergyLogs([]);
     setWaterLogs([]);
+    setMethaneLogs([]);
     setCompletedQuizzes([]);
     setBookmarkedSchemes([]);
     setBadges(["First Step"]);
@@ -361,6 +512,7 @@ export const EcoProvider = ({ children }) => {
         dailyTasks,
         energyLogs,
         waterLogs,
+        methaneLogs,
         completedQuizzes,
         bookmarkedSchemes,
         badges,
@@ -371,6 +523,7 @@ export const EcoProvider = ({ children }) => {
         addXp,
         addEnergyLog,
         addWaterLog,
+        addMethaneLog,
         completeQuiz,
         claimStreakBonus,
         changeOutfit,

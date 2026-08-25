@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import LandingPage from "../pages/Landing/LandingPage";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import ProfilePage from "../pages/Profile/ProfilePage";
@@ -6,10 +6,13 @@ import LoginPage from "../pages/Login/LoginPage";
 import RegisterPage from "../pages/Register/RegisterPage";
 import Navbar from "../componentes/Navbar/Navbar";
 
-const AppRoutes = () => {
+const AppContent = () => {
+  const location = useLocation();
+  const isAuthRoute = location.pathname === "/login" || location.pathname === "/register";
+
   return (
-    <Router>
-      <Navbar />
+    <>
+      {!isAuthRoute && <Navbar />}
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -18,6 +21,14 @@ const AppRoutes = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+    </>
+  );
+};
+
+const AppRoutes = () => {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 };
