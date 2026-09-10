@@ -1,0 +1,6 @@
+Flask
+joblib
+numpy
+pandas
+pymongo
+scikit-learn==1.8.0

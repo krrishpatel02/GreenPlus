@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import { useEco } from "../../context/EcoContext";
 import TeslaChart from "../../componentes/ui/TeslaChart";
-import Mascot from "../../componentes/common/Mascot";
+import DashboardSidebar from "../../componentes/dashboard/DashboardSidebar";
+import DashboardOverview from "../../componentes/dashboard/DashboardOverview";
+import useDashboardNavigation from "../../hooks/useDashboardNavigation";
+import useDashboardMetrics from "../../hooks/useDashboardMetrics.jsx";
+import useDashboardFilters from "../../hooks/useDashboardFilters";
+import useRealtimeConnection from "../../hooks/useRealtimeConnection";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaBars,
@@ -12,18 +16,83 @@ import {
   FaGraduationCap,
   FaBookmark,
   FaDatabase,
-  FaCheckCircle,
-  FaRegCircle,
-  FaFire,
   FaAngleRight,
   FaShareSquare,
-  FaTrophy,
   FaSearch,
   FaFilter,
   FaInfoCircle,
   FaExclamationTriangle,
-  FaApple,
 } from "react-icons/fa";
+import "./Dashboard.css";
+
+const RESEARCH_MODULES = [
+  {
+    number: "01",
+    title: "Carbon Footprint Model",
+    summary: "Limited-feature machine learning can estimate household emissions without a full lifecycle assessment.",
+    sources: [
+      ["Tackling Climate Change with Machine Learning", "https://arxiv.org/abs/1906.05433"],
+      ["Efficient Data-Driven Prediction of Household Carbon Footprint", "https://www.sciencedirect.com/science/article/abs/pii/S0301421523005116"],
+      ["Aligning Artificial Intelligence with Climate Change Mitigation", "https://doi.org/10.1038/s41558-022-01377-7"],
+      ["Achieving Sustainable Practices with Semi-Supervised Learning", "https://link.springer.com/article/10.1007/s10668-024-05578-2"],
+    ],
+  },
+  {
+    number: "02",
+    title: "Energy Recommendation",
+    summary: "Energy prediction becomes more actionable when models explain the household factors behind each recommendation.",
+    sources: [
+      ["A Machine Learning-Powered Energy Consumption Prediction System with API", "https://jesit.springeropen.com/articles/10.1186/s43067-025-00242-9"],
+      ["Personalized Residential Energy Usage Recommendation System", "https://ieeexplore.ieee.org/document/9078031/"],
+      ["Machine Learning Algorithms for Energy Consumption Prediction in Smart Homes", "https://link.springer.com/chapter/10.1007/978-3-031-80817-3_5"],
+      ["Optimizing Daily Household Energy Consumption with Explainable AI", "https://journal.aptika.org/index.php/jistics/article/view/224"],
+    ],
+  },
+  {
+    number: "03",
+    title: "Water Recommendation",
+    summary: "IoT outlet data and interpretable models support targeted conservation tips and leak detection.",
+    sources: [
+      ["Monitoring Water Consumption Patterns with IoT and Machine Learning", "https://doi.org/10.3390/w14142187"],
+      ["Predicting and Understanding Residential Water Use", "https://iopscience.iop.org/article/10.1088/1748-9326/ad1434"],
+      ["Systematic Review of ML Techniques for Household Water Consumption", "https://link.springer.com/article/10.1007/s11269-026-04496-4"],
+      ["Machine Learning for Smart Water Distribution Systems", "https://link.springer.com/article/10.1007/s10462-024-11093-7"],
+    ],
+  },
+  {
+    number: "04",
+    title: "Green Action Prediction",
+    summary: "Random Forest and interpretable behavioral models can identify likely action while keeping the intention gap visible.",
+    sources: [
+      ["Predicting Pro-Environmental Behavioral Intention", "https://www.nature.com/articles/s41598-026-52271-7"],
+      ["Examining Digital Nudges to Influence Pro-Environmental Behavior", "https://www.tandfonline.com/doi/full/10.1080/08874417.2025.2526385"],
+      ["Predictive Analysis of Pro-Environmental Behaviour of College Students", "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9367762/"],
+      ["LLM-Generated Personalized Nudges for Resource Conservation", "https://arxiv.org/html/2604.03881v2"],
+    ],
+  },
+  {
+    number: "05",
+    title: "Personalized Eco Advice",
+    summary: "Sustainable recommender systems work best when environmental goals are part of personalization, not an afterthought.",
+    sources: [
+      ["Advancing Sustainability via Recommender Systems", "https://arxiv.org/pdf/2411.07658"],
+      ["Understanding the Impact of Sustainability-Oriented Recommender Systems", "https://www.sciencedirect.com/science/article/abs/pii/S1567422325000651"],
+      ["Preference Learning for Eco-Friendly Hotels Recommendation", "https://doi.org/10.1016/j.jclepro.2019.01.012"],
+      ["Recommender Systems and Sustainability: A Dual Perspective", "https://www.sciencedirect.com/science/article/pii/S1574013726000213"],
+    ],
+  },
+  {
+    number: "06",
+    title: "Methane Model",
+    summary: "Proxy data, ensemble learning, and IoT monitoring provide a research-backed path for the planned methane feature.",
+    sources: [
+      ["Approaches for Predicting Dairy Cattle Methane Emissions", "https://academic.oup.com/jas/article/doi/10.1093/jas/skae219/7731169"],
+      ["Predicting Methane Emissions in Smallholder Dairy Systems", "https://doi.org/10.3389/fsufs.2025.1668517"],
+      ["Enteric Methane Emission in Livestock Sector: Bibliometric Research", "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11545165/"],
+      ["IoT-Enabled Framework for Real-Time Methane Prediction", "https://www.ijies.org/portfolio-item/B105505020226/"],
+    ],
+  },
+];
 
 const Dashboard = () => {
   const {
@@ -34,7 +103,6 @@ const Dashboard = () => {
     methaneLogs,
     completedQuizzes,
     bookmarkedSchemes,
-    badges,
     DEFAULT_SCHEMES,
     INITIAL_QUIZZES,
     addEnergyLog,
@@ -47,10 +115,8 @@ const Dashboard = () => {
     setLevelUpMessage,
   } = useEco();
 
-  // URL state hook for tab routing
-  const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get("tab") || "overview";
-  const setActiveTab = (tab) => setSearchParams({ tab });
+  const { activeTab, setActiveTab } = useDashboardNavigation();
+  const { status: realtimeStatus } = useRealtimeConnection(import.meta.env.VITE_REALTIME_URL);
 
   // Sidebar Layout State
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -96,18 +162,26 @@ const Dashboard = () => {
   const [schemeSearch, setSchemeSearch] = useState("");
   const [schemeCategoryFilter, setSchemeCategoryFilter] = useState("All");
   const [selectedSchemeDetail, setSelectedSchemeDetail] = useState(null);
+  const [researchSearch, setResearchSearch] = useState("");
+  const [researchModuleFilter, setResearchModuleFilter] = useState("All");
 
-  // useMemo hook to filter schemes list
-  const filteredSchemes = useMemo(() => {
-    return DEFAULT_SCHEMES.filter((sch) => {
-      const matchSearch =
-        sch.title.toLowerCase().includes(schemeSearch.toLowerCase()) ||
-        sch.desc.toLowerCase().includes(schemeSearch.toLowerCase());
-      const matchCat =
-        schemeCategoryFilter === "All" || sch.category === schemeCategoryFilter;
-      return matchSearch && matchCat;
-    });
-  }, [DEFAULT_SCHEMES, schemeSearch, schemeCategoryFilter]);
+  const { filteredSchemes, filteredResearchModules } = useDashboardFilters({
+    schemes: DEFAULT_SCHEMES,
+    schemeSearch,
+    schemeCategoryFilter,
+    researchModules: RESEARCH_MODULES,
+    researchSearch,
+    researchModuleFilter,
+  });
+
+  const { overviewPulse, overviewModules } = useDashboardMetrics({
+    energyLogs,
+    waterLogs,
+    methaneLogs,
+    completedQuizzes,
+    bookmarkedSchemes,
+    quizCount: INITIAL_QUIZZES.length,
+  });
 
   // Handlers
   const handleLogEnergySubmit = (e) => {
@@ -215,106 +289,26 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 flex font-sans pt-16">
-      {/* Notion-style Left Sidebar */}
-      <motion.aside
-        animate={{ width: sidebarOpen ? 260 : 0 }}
-        className="bg-slate-900 text-slate-300 border-r border-slate-800 overflow-hidden flex flex-col shrink-0 z-40"
-      >
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🌿</span>
-            <span className="font-extrabold text-white text-sm tracking-wide font-sans">GreenPlus Space</span>
-          </div>
-          <span className="text-[10px] bg-slate-800 text-slate-400 font-bold px-2 py-0.5 rounded">v2.0 Verified</span>
-        </div>
-
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          <div className="text-[10px] uppercase font-bold text-slate-500 px-3 mb-2 tracking-wider">RESEARCH MODULES</div>
-          <button
-            onClick={() => setActiveTab("overview")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
-              activeTab === "overview" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <span>📊</span> Overview
-          </button>
-          <button
-            onClick={() => setActiveTab("energy")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
-              activeTab === "energy" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <span>⚡</span> Energy & XAI
-          </button>
-          <button
-            onClick={() => setActiveTab("water")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
-              activeTab === "water" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <span>💧</span> Water & Sensors
-          </button>
-          <button
-            onClick={() => setActiveTab("methane")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
-              activeTab === "methane" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <span>🐮</span> Methane Model
-          </button>
-          <button
-            onClick={() => setActiveTab("learning")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
-              activeTab === "learning" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <span>🌍</span> Rio Trio Quizzes
-          </button>
-          <button
-            onClick={() => setActiveTab("schemes")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
-              activeTab === "schemes" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <span>🏛️</span> Green Schemes
-          </button>
-          <button
-            onClick={() => setActiveTab("ai")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
-              activeTab === "ai" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <span>🤖</span> AI Nudge Assistant
-          </button>
-          <button
-            onClick={() => setActiveTab("leaderboard")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
-              activeTab === "leaderboard" ? "bg-slate-800 text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <span>🏆</span> Leaderboard
-          </button>
-        </nav>
-
-        <div className="p-4 border-t border-slate-800 bg-slate-900/60">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Research Fact-Checked</span>
-          </div>
-        </div>
-      </motion.aside>
+    <div className="dashboard-motion-page min-h-screen bg-[#030303] flex font-sans pt-16">
+      <div className="dashboard-cyber-mesh" aria-hidden="true">
+        <span className="dashboard-cyber-orb dashboard-cyber-orb--mint" />
+        <span className="dashboard-cyber-orb dashboard-cyber-orb--blue" />
+        <span className="dashboard-cyber-orb dashboard-cyber-orb--amber" />
+      </div>
+      <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} sidebarOpen={sidebarOpen} />
 
       {/* Main Panel */}
       <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 max-w-7xl mx-auto">
         {/* Toggle Sidebar Button & Breadcrumbs */}
         <div className="flex items-center gap-4 mb-8">
-          <button
+          <motion.button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 text-slate-500 hover:text-slate-950 bg-white border border-slate-100 rounded-xl hover:shadow-sm transition cursor-pointer"
+            whileHover={{ scale: 1.03, boxShadow: "0 0 22px rgba(184, 243, 107, 0.2)" }}
+            whileTap={{ scale: 0.96 }}
           >
             <FaBars />
-          </button>
+          </motion.button>
           <div className="flex items-center gap-2 text-sm text-slate-400 font-semibold font-sans">
             <FaFolder />
             <span>GreenPlus Workspace</span>
@@ -353,129 +347,20 @@ const Dashboard = () => {
 
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === "overview" && (
-          <div className="space-y-8 animate-fadeIn">
-            {/* Gamification Stats */}
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-8">
-              <div className="flex flex-col sm:flex-row items-center gap-6">
-                <div className="relative w-20 h-20 bg-amber-50 rounded-full border border-amber-100 flex items-center justify-center text-4xl shadow-inner">
-                  <FaFire className="text-amber-500 animate-bounce" />
-                  <span className="absolute bottom-[-5px] right-[-5px] bg-amber-500 text-white font-extrabold text-xs px-2.5 py-0.5 rounded-full shadow">
-                    {user.streak}d
-                  </span>
-                </div>
-
-                <div className="text-center sm:text-left">
-                  <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Your Current Streak: {user.streak} Days!</h2>
-                  <p className="text-slate-400 text-sm mt-1">Log carbon metrics daily to grow your leaf and level up.</p>
-                  
-                  <button
-                    disabled={user.streakClaimed}
-                    onClick={claimStreakBonus}
-                    className={`mt-4 px-6 py-3 font-bold rounded-2xl text-sm transition-all ${
-                      user.streakClaimed
-                        ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
-                        : "bg-amber-500 hover:bg-amber-400 text-white shadow-[0_4px_0_0_#d97706] active:translate-y-1 active:shadow-none cursor-pointer"
-                    }`}
-                  >
-                    {user.streakClaimed ? "Streak Claimed Today ✓" : "Claim Daily Streak Bonus (+25 XP)"}
-                  </button>
-                </div>
-              </div>
-
-              <div className="w-full md:w-[320px] bg-slate-50 border border-slate-100 rounded-2xl p-5 shadow-sm">
-                <div className="flex justify-between items-center text-xs font-extrabold text-slate-600 mb-2">
-                  <span className="flex items-center gap-1">⭐ Level {user.level}</span>
-                  <span>{user.xp} / {user.xpToNextLevel} XP</span>
-                </div>
-                <div className="w-full bg-slate-200 h-3 rounded-full overflow-hidden mb-2">
-                  <div
-                    className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
-                    style={{ width: `${(user.xp / user.xpToNextLevel) * 100}%` }}
-                  ></div>
-                </div>
-                <span className="text-[10px] text-slate-400 block text-right font-semibold">
-                  {user.xpToNextLevel - user.xp} XP remaining to Level {user.level + 1}
-                </span>
-              </div>
-            </div>
-
-            {/* Research Module 4: Green Action Prediction & Digital Nudge Engine */}
-            <div className="bg-gradient-to-r from-emerald-900 to-slate-900 text-white rounded-3xl p-6 shadow-md border border-emerald-500/20 flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="space-y-2 max-w-xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-emerald-300 text-xs font-bold uppercase tracking-wider">
-                  🤖 Module 4: Action Prediction & Digital Nudges
-                </div>
-                <h3 className="text-xl font-extrabold text-white">Predicted Green Action Likelihood: 88%</h3>
-                <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                  "Personalized LLM-generated nudges outperform generic nudges for household resource conservation." — *Journal of Computer Information Systems (2025/2026)*
-                </p>
-              </div>
-              <button
-                onClick={() => setActiveTab("ai")}
-                className="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-2xl shadow-[0_4px_0_0_#059669] active:translate-y-1 active:shadow-none transition-all cursor-pointer shrink-0 text-xs"
-              >
-                Open Nudge Assistant
-              </button>
-            </div>
-
-            {/* Main Overview Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              {/* Left Column: Daily Checklist */}
-              <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <span>📅</span> Daily Eco-Checklist
-                </h3>
-                <div className="space-y-3">
-                  {dailyTasks.map((task) => (
-                    <div
-                      key={task.id}
-                      onClick={() => {
-                        if (task.id === "log_energy") setActiveTab("energy");
-                        if (task.id === "log_water") setActiveTab("water");
-                        if (task.id === "log_methane") setActiveTab("methane");
-                        if (task.id === "quiz") setActiveTab("learning");
-                      }}
-                      className={`p-4 rounded-2xl border transition flex items-center justify-between cursor-pointer ${
-                        task.completed
-                          ? "bg-emerald-50/30 border-emerald-100 text-slate-400 line-through"
-                          : "bg-white border-slate-100 hover:border-emerald-200 text-slate-800 hover:bg-slate-50/30"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        {task.completed ? (
-                          <FaCheckCircle className="text-emerald-500 text-lg" />
-                        ) : (
-                          <FaRegCircle className="text-slate-300 text-lg" />
-                        )}
-                        <span className="font-semibold text-sm">{task.text}</span>
-                      </div>
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded ${task.completed ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-600"}`}>
-                        +{task.xp} XP
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right Column: Mascot Greeting Box */}
-              <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col items-center justify-center text-center">
-                <Mascot
-                  mood={user.streakClaimed ? "celebrate" : "happy"}
-                  outfit={user.leafyOutfit}
-                  speechText={
-                    user.streakClaimed
-                      ? `Fantastic! Our streak is active. Check out my wardrobe outfits in the Profile to dress me up!`
-                      : `Welcome back to our control center! Complete the eco checklist items to boost our score.`
-                  }
-                />
-              </div>
-            </div>
-          </div>
+          <DashboardOverview
+            user={user}
+            dailyTasks={dailyTasks}
+            overviewPulse={overviewPulse}
+            overviewModules={overviewModules}
+            claimStreakBonus={claimStreakBonus}
+            setActiveTab={setActiveTab}
+            realtimeStatus={realtimeStatus}
+          />
         )}
 
         {/* ==================== ENERGY TRACKER TAB ==================== */}
         {activeTab === "energy" && (
-          <div className="space-y-8 animate-fadeIn">
+          <div className="dashboard-tab-stage space-y-8 animate-fadeIn">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="bg-slate-950 text-white rounded-2xl p-6 border border-slate-800 shadow-md flex flex-col justify-between h-[140px]">
                 <span className="text-xs uppercase font-extrabold tracking-wider text-slate-500">Cumulative CO₂ Offsets</span>
@@ -630,7 +515,7 @@ const Dashboard = () => {
 
         {/* ==================== WATER TRACKER TAB ==================== */}
         {activeTab === "water" && (
-          <div className="space-y-8 animate-fadeIn">
+          <div className="dashboard-tab-stage dashboard-water space-y-8 animate-fadeIn">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-blue-50/40 border border-blue-100 rounded-2xl p-6 flex items-center justify-between">
                 <div>
@@ -735,7 +620,7 @@ const Dashboard = () => {
 
         {/* ==================== METHANE MODEL TAB (Module 6 from PDF) ==================== */}
         {activeTab === "methane" && (
-          <div className="space-y-8 animate-fadeIn">
+          <div className="dashboard-tab-stage space-y-8 animate-fadeIn">
             {/* Header Shield */}
             <div className="bg-gradient-to-r from-emerald-800 to-teal-900 text-white rounded-3xl p-8 border border-emerald-500/20 shadow-md">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -825,7 +710,7 @@ const Dashboard = () => {
 
         {/* ==================== LEARNING CENTER (RIO TRIO QUIZZES) TAB ==================== */}
         {activeTab === "learning" && (
-          <div className="space-y-8 animate-fadeIn">
+          <div className="dashboard-tab-stage dashboard-learning space-y-8 animate-fadeIn">
             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-center gap-6">
               <div>
                 <h3 className="text-xl font-bold text-emerald-950 flex items-center gap-2">
@@ -971,6 +856,75 @@ const Dashboard = () => {
                 })}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ==================== RESEARCH LIBRARY TAB ==================== */}
+        {activeTab === "research" && (
+          <div className="dashboard-tab-stage dashboard-research space-y-8 animate-fadeIn">
+            <div className="dashboard-research__hero">
+              <div>
+                <span className="dashboard-kicker">Verified research review</span>
+                <h2>Evidence behind GreenPlus</h2>
+                <p>Six product modules grounded in the supplied literature review, with peer-reviewed and authoritative sources kept distinct.</p>
+              </div>
+              <span className="dashboard-research__count">{filteredResearchModules.length} MODULES · {filteredResearchModules.reduce((total, module) => total + module.sources.length, 0)} PAPERS</span>
+            </div>
+
+            <div className="dashboard-research__controls">
+              <div className="dashboard-research__search">
+                <FaSearch />
+                <input
+                  type="search"
+                  value={researchSearch}
+                  onChange={(event) => setResearchSearch(event.target.value)}
+                  placeholder="Search papers, methods, or modules"
+                  aria-label="Search research library"
+                />
+              </div>
+              <select
+                value={researchModuleFilter}
+                onChange={(event) => setResearchModuleFilter(event.target.value)}
+                aria-label="Filter research modules"
+              >
+                <option value="All">All modules</option>
+                {RESEARCH_MODULES.map((module) => <option key={module.number} value={module.number}>{module.number} · {module.title}</option>)}
+              </select>
+            </div>
+
+            <div className="dashboard-research__grid">
+              {filteredResearchModules.map((module) => (
+                <motion.article
+                  className="dashboard-research__card dashboard-focus-row"
+                  key={module.number}
+                  initial={{ opacity: 0.45, scale: 0.97, borderColor: "rgba(63, 63, 70, 0.45)" }}
+                  whileInView={{ opacity: 1, scale: 1, borderColor: "rgba(184, 243, 107, 0.55)" }}
+                  viewport={{ amount: 0.7, margin: "-12% 0px -12%" }}
+                  transition={{ type: "spring", stiffness: 120, damping: 18 }}
+                >
+                  <div className="dashboard-research__card-top">
+                    <span>{module.number}</span>
+                    <span>Literature signal</span>
+                  </div>
+                  <h3>{module.title}</h3>
+                  <p>{module.summary}</p>
+                  <div className="dashboard-research__sources">
+                    {module.sources.map(([title, url]) => (
+                      <a key={url} href={url} target="_blank" rel="noreferrer">
+                        <span>{title}</span><FaShareSquare />
+                      </a>
+                    ))}
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+
+            {!filteredResearchModules.length && <div className="dashboard-research__empty">No research matches this search. Try a module name, method, or paper title.</div>}
+
+            <div className="dashboard-research__note">
+              <strong>Authoritative context</strong>
+              <span>Rio Trio: UNFCCC, CBD, and UNCCD. Methane context: IPCC, UNEP/CCAC, and IEA resources.</span>
+            </div>
           </div>
         )}
 
@@ -1199,7 +1153,7 @@ const Dashboard = () => {
 
         {/* ==================== LEADERBOARD TAB ==================== */}
         {activeTab === "leaderboard" && (
-          <div className="space-y-8 max-w-4xl mx-auto animate-fadeIn">
+          <div className="dashboard-tab-stage space-y-8 max-w-4xl mx-auto animate-fadeIn">
             <div className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white rounded-3xl p-6 shadow-[0_6px_15px_rgba(245,158,11,0.25)] flex flex-col sm:flex-row justify-between items-center gap-6 border border-amber-400/20">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-4xl shadow-inner animate-pulse">

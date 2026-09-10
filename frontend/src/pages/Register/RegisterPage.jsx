@@ -4,6 +4,7 @@ import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
 import { motion } from "framer-motion";
 import AnimatedPage from "../../componentes/common/AnimatedPage";
+import { authApi } from "../../services/api";
 import "../Auth/AuthPage.css";
 
 const RegisterPage = () => {
@@ -11,16 +12,23 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    setUser((prev) => ({
-      ...prev,
-      name: name || "Eco Champion",
-      streakClaimed: false,
-    }));
-    navigate("/dashboard");
+    setError("");
+    setLoading(true);
+    try {
+      const data = await authApi.register({ name, email, password });
+      setUser(data.user);
+      navigate("/dashboard");
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,6 +65,8 @@ const RegisterPage = () => {
                 placeholder="e.g. Flora, EcoWarrior"
               />
             </div>
+
+            {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
 
             <div className="auth-field">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -103,7 +113,7 @@ const RegisterPage = () => {
               type="submit"
               className="auth-submit w-full py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-[0_4px_0_0_#059669] hover:bg-emerald-400 active:shadow-none active:translate-y-1 transition-all text-center tracking-wide"
             >
-              Join the Green Movement
+              {loading ? "Creating account..." : "Join the Green Movement"}
             </motion.button>
           </form>
 

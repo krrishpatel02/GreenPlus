@@ -99,13 +99,36 @@
   animation-duration: 14s;
 }
 
+.orbit-satellite {
+  position: absolute;
+  z-index: 3;
+  width: 106px;
+  height: 48px;
+  animation: satellite-drift 7s ease-in-out infinite;
+}
+
+.orbit-satellite--energy { top: 38px; left: 0; }
+
+.orbit-satellite--water {
+  top: 38px;
+  right: 0;
+  animation-delay: -2.4s;
+}
+
+.orbit-satellite--habit {
+  right: 50%;
+  bottom: 5px;
+  transform: translateX(50%);
+  animation-delay: -4.8s;
+}
+
 .orbit-core {
   position: absolute;
-  top: 30%;
-  left: 37%;
+  top: 50%;
+  left: 50%;
   display: flex;
-  width: 117px;
-  height: 117px;
+  width: 100px;
+  height: 100px;
   align-items: center;
   justify-content: center;
   flex-direction: column;
@@ -136,7 +159,7 @@
   width: 100%;
   color: #f5fffb;
   font-family: 'Outfit', sans-serif;
-  font-size: 2.75rem;
+  font-size: 2.35rem;
   line-height: 1;
   text-align: center;
 }
@@ -178,9 +201,7 @@
 
 .orbit-node svg { color: #8cf2c0; }
 .orbit-node b { color: #ffd477; font-size: 0.75rem; }
-.orbit-node--energy { top: 32px; left: 0; animation-delay: -1s; }
-.orbit-node--water { top: 32px; right: 0; animation-delay: -2.2s; }
-.orbit-node--habit { bottom: 7px; left: 50%; margin-left: -53px; animation-delay: -3.1s; }
+.orbit-satellite .orbit-node { position: relative; top: auto; right: auto; bottom: auto; left: auto; margin-left: 0; animation: none; }
 
 .orbit-node:hover,
 .orbit-node.is-selected {
@@ -312,6 +333,36 @@
   font-style: normal;
   transform: translate(-50%, -50%);
 }
+
+.action-orbit-signal {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: grid;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  padding: 0;
+  color: #75f1d0;
+  border: 1px solid rgba(93, 224, 255, 0.52);
+  border-radius: 50%;
+  background: #0a2b47;
+  box-shadow: 0 0 14px rgba(50, 194, 255, 0.35), 0 5px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.action-orbit-signal:hover,
+.action-orbit-signal.is-selected {
+  color: #082746;
+  background: #8cf2c0;
+  box-shadow: 0 0 0 6px rgba(140, 242, 192, 0.12), 0 0 22px rgba(140, 242, 192, 0.8);
+  transform: translate(-50%, -50%) scale(1.18);
+}
+
+.action-orbit-track--two .action-orbit-signal { top: 50%; left: 0; }
+.action-orbit-track--three .action-orbit-signal { top: 50%; left: auto; right: -14px; }
 
 .action-orbit-track--one { width: 455px; height: 184px; animation: trading-orbit 14s linear infinite; }
 .action-orbit-track--one i { top: 0; left: 50%; }
@@ -638,6 +689,25 @@
 
 .landing-feature-card:hover::after { transform: scale(1.35); }
 
+.landing-page .hero-actions,
+.landing-page .impact-carousel,
+.landing-page .landing-calculator__panel,
+.landing-page .action-orbit-section,
+.landing-page .landing-feature-card {
+  animation: landing-surface-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.landing-page .impact-carousel { animation-delay: 140ms; }
+.landing-page .landing-calculator__panel { animation-delay: 100ms; }
+.landing-page .action-orbit-section { animation-delay: 160ms; }
+.landing-page .landing-feature-card:nth-child(2) { animation-delay: 90ms; }
+.landing-page .landing-feature-card:nth-child(3) { animation-delay: 180ms; }
+
+@keyframes landing-surface-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .landing-feature-grid {
   position: relative;
 }
@@ -687,16 +757,28 @@
   50% { box-shadow: 0 0 0 10px rgba(140, 242, 192, 0.04), 0 10px 34px rgba(79, 220, 157, 0.3); }
 }
 
+@keyframes satellite-orbit {
+  from { transform: translate(-50%, -50%) rotate(0deg) translateX(205px); }
+  to { transform: translate(-50%, -50%) rotate(360deg) translateX(205px); }
+}
+
+@keyframes satellite-drift {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -7px; }
+}
+
 @media (max-width: 640px) {
   .landing-hero { min-height: auto; padding-top: 7rem; }
   .impact-carousel { margin-top: 38px; padding: 20px; border-radius: 23px; }
   .hero-orbit-dashboard { width: min(100%, 430px); height: 235px; margin-top: 18px; margin-bottom: 30px; }
   .orbit-ring--outer { width: 370px; height: 158px; }
   .orbit-ring--inner { width: 260px; height: 110px; }
-  .orbit-core { top: 32%; left: 37%; width: 99px; height: 99px; }
-  .orbit-core strong { font-size: 2.24rem; }
-  .orbit-node { width: 98px; }
-  .orbit-node--habit { margin-left: -49px; }
+  .orbit-core { top: 50%; left: 50%; width: 84px; height: 84px; }
+  .orbit-core strong { font-size: 1.92rem; }
+  .orbit-satellite { width: 98px; }
+  .orbit-satellite--energy,
+  .orbit-satellite--water { top: 28px; }
+  .orbit-satellite--habit { bottom: 3px; }
   .landing-orbit-section { padding: 0 16px 60px; }
   .action-orbit-section { display: block; min-height: 0; padding: 28px 24px 10px; }
   .action-orbit-copy h2 { font-size: 2.35rem; }
@@ -711,6 +793,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-kicker, .impact-live span, .landing-calculator::before, .orbit-ring, .orbit-node, .action-orbit-track, .action-orbit-planet { animation: none; }
-  .floating-action-bar, .impact-carousel { transition: none; }
+  .hero-kicker, .impact-live span, .landing-calculator::before, .orbit-ring, .orbit-satellite, .orbit-node, .action-orbit-track, .action-orbit-planet { animation: none; }
+  .floating-action-bar, .impact-carousel,
+  .landing-page .hero-actions,
+  .landing-page .impact-carousel,
+  .landing-page .landing-calculator__panel,
+  .landing-page .action-orbit-section,
+  .landing-page .landing-feature-card { animation: none; }
 }
