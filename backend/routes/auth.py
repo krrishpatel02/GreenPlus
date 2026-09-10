@@ -1,15 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
-from ..services.auth_service import AuthService
+from ..http import handle_request, json_body
+from ..services.container import get_auth_service
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
-
-
-def payload():
-    data = request.get_json(silent=True)
-    if not isinstance(data, dict):
-        raise ValueError("Request body must be a JSON object.")
-    return data
 
 
 def validate_credentials(data, require_name=False):
@@ -26,22 +20,15 @@ def validate_credentials(data, require_name=False):
 
 
 @auth_bp.post("/register")
+@handle_request(failure_status=503, failure_message="Database is unavailable.")
 def register():
-    try:
-        name, email, password = validate_credentials(payload(), True)
-        return jsonify({"status": "success", "user": AuthService().register(name, email, password)}), 201
-    except ValueError as exc:
-        return jsonify({"status": "error", "error": str(exc)}), 400
-    except Exception as exc:
-        return jsonify({"status": "error", "error": "Database is unavailable.", "detail": type(exc).__name__}), 503
+    name, email, password = validate_credentials(json_body(), True)
+    user = get_auth_service().register(name, email, password)
+    return jsonify({"status": "success", "user": user}), 201
 
 
 @auth_bp.post("/login")
+@handle_request(validation_status=401, failure_status=503, failure_message="Database is unavailable.")
 def login():
-    try:
-        _, email, password = validate_credentials(payload())
-        return jsonify({"status": "success", "user": AuthService().login(email, password)})
-    except ValueError as exc:
-        return jsonify({"status": "error", "error": str(exc)}), 401
-    except Exception as exc:
-        return jsonify({"status": "error", "error": "Database is unavailable.", "detail": type(exc).__name__}), 503
+    _, email, password = validate_credentials(json_body())
+    return jsonify({"status": "success", "user": get_auth_service().login(email, password)})

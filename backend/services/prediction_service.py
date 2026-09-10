@@ -1,31 +1,16 @@
-from pathlib import Path
-import sys
-
-import joblib
 import numpy as np
 import pandas as pd
 
 from ..config import ROOT_DIR
-
-ENERGY_DIR = ROOT_DIR / "ai" / "energy"
-sys.path.insert(0, str(ENERGY_DIR))
-from energy_calculator import greenplus_energy_analysis  # noqa: E402
+from .energy_engine import analyze as analyze_energy_engine
+from .model_loader import LazyModel
 
 
 class PredictionService:
     def __init__(self):
         ai_dir = ROOT_DIR / "ai"
-        self.carbon_model, self.carbon_error = self._load(ai_dir / "carbon" / "carbon_model_v3.joblib")
-        self.energy_model, self.energy_error = self._load(ai_dir / "energy" / "energy_model_v2.joblib")
-
-    @staticmethod
-    def _load(path):
-        if not path.exists():
-            return None, f"Model file not found: {path.name}"
-        try:
-            return joblib.load(path), None
-        except Exception as exc:
-            return None, f"Model could not be loaded: {type(exc).__name__}"
+        self.carbon_model = LazyModel(ai_dir / "carbon" / "carbon_model_v3.joblib")
+        self.energy_model = LazyModel(ai_dir / "energy" / "energy_model_v2.joblib")
 
     @staticmethod
     def number(payload, name, default=None, integer=False, minimum=None):
@@ -77,23 +62,28 @@ class PredictionService:
         if hour > 23 or day > 6:
             raise ValueError("'hour' must be 0-23 and 'day_of_week' must be 0-6.")
         temp, humidity = n(payload, "temp_out", 22.0), n(payload, "humidity_out", 50.0, minimum=0)
-        values = {name: 0.0 for name in self.energy_model.feature_names_in_}
+        model = self.energy_model.model
+        if model is None:
+            raise RuntimeError(f"Energy prediction is unavailable. {self.energy_model.error}")
+        values = {name: 0.0 for name in model.feature_names_in_}
         values.update({"lights": n(payload, "lights", 0, minimum=0), "T1": 21, "RH_1": 45, "T2": 20.5, "RH_2": 44, "T3": 22.1, "RH_3": 44, "T4": 21, "RH_4": 44, "T5": 21, "RH_5": 45, "T6": temp, "RH_6": humidity, "T7": 21, "RH_7": 45, "T8": 21, "RH_8": 45, "T9": 21, "RH_9": 45, "T_out": temp, "RH_out": humidity, "hour": hour, "day_of_week": day, "month": n(payload, "month", 7, True, 1), "day": n(payload, "day", 15, True, 1), "is_weekend": n(payload, "is_weekend", int(day >= 5), True, 0), "is_working_hour": int(9 <= hour <= 18), "is_morning": int(6 <= hour < 12), "is_afternoon": int(12 <= hour < 18), "is_evening": int(18 <= hour < 23), "is_night": int(hour >= 23 or hour < 6), "hour_sin": np.sin(2 * np.pi * hour / 24), "hour_cos": np.cos(2 * np.pi * hour / 24), "day_sin": np.sin(2 * np.pi * day / 7), "day_cos": np.cos(2 * np.pi * day / 7), "month_sin": np.sin(2 * np.pi * 7 / 12), "month_cos": np.cos(2 * np.pi * 7 / 12), "T1_Tout_difference": 21 - temp, "T2_Tout_difference": 20.5 - temp, "T3_Tout_difference": 22.1 - temp, "RH1_RHout_difference": 45 - humidity, "RH2_RHout_difference": 44 - humidity, "outdoor_heat_humidity": temp * humidity, "indoor_heat_humidity": 945, "temperature_mean": 21.2, "temperature_min": 20.5, "temperature_max": 22.1, "temperature_range": 1.6, "humidity_mean": 44.5, "humidity_min": 44, "humidity_max": 45, "humidity_range": 1})
         return values
 
     def status(self):
-        return {"carbon": {"available": self.carbon_model is not None, "error": self.carbon_error}, "energy": {"available": self.energy_model is not None, "error": self.energy_error}}
+        return {"carbon": {"available": self.carbon_model.available, "error": self.carbon_model.error}, "energy": {"available": self.energy_model.available, "error": self.energy_model.error}}
 
     def carbon(self, payload):
-        if self.carbon_model is None:
-            raise RuntimeError(f"Carbon prediction is unavailable. {self.carbon_error}")
-        return round(float(self.carbon_model.predict(pd.DataFrame([self.carbon_features(payload)]))[0]), 2)
+        model = self.carbon_model.model
+        if model is None:
+            raise RuntimeError(f"Carbon prediction is unavailable. {self.carbon_model.error}")
+        return round(float(model.predict(pd.DataFrame([self.carbon_features(payload)]))[0]), 2)
 
     def energy(self, payload):
-        if self.energy_model is None:
-            raise RuntimeError(f"Energy prediction is unavailable. {self.energy_error}")
-        value = float(self.energy_model.predict(pd.DataFrame([self.energy_features(payload)]))[0])
+        model = self.energy_model.model
+        if model is None:
+            raise RuntimeError(f"Energy prediction is unavailable. {self.energy_model.error}")
+        value = float(model.predict(pd.DataFrame([self.energy_features(payload)]))[0])
         return {"appliances_wh": round(value, 2), "appliances_kwh": round(value / 1000, 3)}
 
     def analyze_energy(self, payload):
-        return greenplus_energy_analysis(appliances=payload["appliances"], solar_kwh=self.number(payload, "solar_kwh", 0, minimum=0), household_size=self.number(payload, "household_size", integer=True, minimum=1), home_area_sqft=self.number(payload, "home_area_sqft", minimum=1), tariff_id=payload.get("tariff_id", "demo_residential"), emission_factor=self.number(payload, "emission_factor", 0.7, minimum=0))
+        return analyze_energy_engine(payload, self.number)

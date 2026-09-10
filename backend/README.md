@@ -6,10 +6,14 @@
 - `config.py`: environment-backed configuration.
 - `database/`: shared MongoDB client and database boundary.
 - `routes/`: HTTP endpoints grouped by feature.
+- `http.py`: shared JSON parsing and route error handling.
 - `services/`: prediction and authentication business logic.
+- `services/container.py`: cached service factories; services are created on first use.
+- `services/model_loader.py`: lazy ML artifact loading and availability reporting.
+- `services/energy_engine.py`: isolated deterministic energy-analysis adapter.
 - `repositories/`: MongoDB persistence operations.
 
-Prediction models are loaded lazily by the first prediction request. Health and authentication requests do not load the ML artifacts.
+Prediction services and models are loaded lazily by the first prediction request. Health and authentication requests do not load the ML artifacts.
 
 ## Run
 
