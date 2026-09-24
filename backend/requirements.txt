@@ -1,6 +1,8 @@
 Flask
+gunicorn
 joblib
 numpy
 pandas
 pymongo
+PyJWT
 scikit-learn==1.8.0

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useEco } from "../../context/EcoContext";
 import Mascot from "../../componentes/common/Mascot";
-import { motion } from "framer-motion";
 import { FaUser, FaTrophy, FaRedo, FaEdit, FaCheck, FaLock } from "react-icons/fa";
+import { authApi } from "../../services/api";
 
 const ALL_BADGES = [
   { name: "First Step", desc: "Created a GreenPlus account to start the green journey.", icon: "🌱" },
@@ -18,10 +18,21 @@ const ProfilePage = () => {
   const [editingName, setEditingName] = useState(false);
   const [tempName, setTempName] = useState(user.name);
   const [resetConfirm, setResetConfirm] = useState(false);
+  const [savingName, setSavingName] = useState(false);
+  const [profileError, setProfileError] = useState("");
 
-  const handleSaveName = () => {
-    setUser((prev) => ({ ...prev, name: tempName }));
-    setEditingName(false);
+  const handleSaveName = async () => {
+    setProfileError("");
+    setSavingName(true);
+    try {
+      const data = await authApi.updateProfile({ name: tempName });
+      setUser(data.user);
+      setEditingName(false);
+    } catch (requestError) {
+      setProfileError(requestError.message);
+    } finally {
+      setSavingName(false);
+    }
   };
 
   const getOutfitUnlockCondition = (outfitId) => {
@@ -125,7 +136,7 @@ const ProfilePage = () => {
                         onChange={(e) => setTempName(e.target.value)}
                         className="px-3 py-1.5 border border-slate-200 rounded-lg text-lg font-bold text-slate-800 focus:outline-none focus:border-emerald-500"
                       />
-                      <button onClick={handleSaveName} className="p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition">
+                      <button onClick={handleSaveName} disabled={savingName} className="p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition disabled:opacity-50">
                         <FaCheck />
                       </button>
                     </div>
@@ -138,6 +149,7 @@ const ProfilePage = () => {
                     </div>
                   )}
                   <span className="text-xs text-slate-400 font-semibold block mt-0.5">Eco Champion Profile</span>
+                  {profileError && <span className="text-xs text-red-600 block mt-1" role="alert">{profileError}</span>}
                 </div>
               </div>
 

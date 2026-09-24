@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
+import { useAuth } from "../../context/AuthContext";
 import Mascot from "../../componentes/common/Mascot";
 import { motion } from "framer-motion";
 import AnimatedPage from "../../componentes/common/AnimatedPage";
-import { authApi } from "../../services/api";
 import "../Auth/AuthPage.css";
 
 const RegisterPage = () => {
   const { setUser } = useEco();
+  const { register } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -21,8 +22,8 @@ const RegisterPage = () => {
     setError("");
     setLoading(true);
     try {
-      const data = await authApi.register({ name, email, password });
-      setUser(data.user);
+      const response = await register({ name, email, password });
+      setUser(response.user);
       navigate("/dashboard");
     } catch (requestError) {
       setError(requestError.message);
@@ -122,6 +123,11 @@ const RegisterPage = () => {
             <Link to="/login" className="font-bold text-emerald-600 hover:text-emerald-700 transition">
               Sign In instead
             </Link>
+            <div className="mt-3">
+              <Link to="/admin/register" className="font-bold text-sky-400 hover:text-sky-300 transition">
+                Admin registration
+              </Link>
+            </div>
           </div>
         </div>
       </div>

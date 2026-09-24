@@ -1,0 +1,142 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:07.326919+00:00",
+  "source": "ai\\air_quality\\air_quality_dataset.csv",
+  "source_sha256": "4608dc22cf8f62f41605cc82faf297ef52ea9ec858c39d81c62d4e34a3373430",
+  "role": "dataset_candidate",
+  "rows": 2208,
+  "columns": 8,
+  "feature_names": [
+    "time",
+    "carbon_monoxide",
+    "nitrogen_dioxide",
+    "ozone",
+    "dust",
+    "pm2_5",
+    "hour",
+    "day_of_year"
+  ],
+  "target_column": "pm2_5",
+  "dtypes": {
+    "time": "str",
+    "carbon_monoxide": "float64",
+    "nitrogen_dioxide": "float64",
+    "ozone": "float64",
+    "dust": "float64",
+    "pm2_5": "float64",
+    "hour": "int64",
+    "day_of_year": "int64"
+  },
+  "numeric_features": [
+    "carbon_monoxide",
+    "nitrogen_dioxide",
+    "ozone",
+    "dust",
+    "pm2_5",
+    "hour",
+    "day_of_year"
+  ],
+  "categorical_features": [
+    "time"
+  ],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "time": {
+      "unique_count": 2208
+    },
+    "carbon_monoxide": {
+      "unique_count": 1004
+    },
+    "nitrogen_dioxide": {
+      "unique_count": 775
+    },
+    "ozone": {
+      "unique_count": 261
+    },
+    "dust": {
+      "unique_count": 757
+    },
+    "pm2_5": {
+      "unique_count": 752
+    },
+    "hour": {
+      "unique_count": 24
+    },
+    "day_of_year": {
+      "unique_count": 92
+    }
+  },
+  "outlier_analysis": {
+    "carbon_monoxide": {
+      "method": "IQR",
+      "count": 139,
+      "lower": -286.375,
+      "upper": 1506.625
+    },
+    "nitrogen_dioxide": {
+      "method": "IQR",
+      "count": 17,
+      "lower": -38.7,
+      "upper": 102.1
+    },
+    "ozone": {
+      "method": "IQR",
+      "count": 5,
+      "lower": -102.0,
+      "upper": 282.0
+    },
+    "dust": {
+      "method": "IQR",
+      "count": 108,
+      "lower": -653.375,
+      "upper": 1107.625
+    },
+    "pm2_5": {
+      "method": "IQR",
+      "count": 65,
+      "lower": -42.8,
+      "upper": 183.6
+    },
+    "hour": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -11.5,
+      "upper": 34.5
+    },
+    "day_of_year": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 116.5,
+      "upper": 298.5
+    }
+  },
+  "target_distribution": {
+    "unique_count": 752
+  },
+  "target_numeric_summary": {
+    "count": 2208.0,
+    "mean": 75.850996,
+    "std": 43.796371,
+    "min": 11.7,
+    "25%": 42.1,
+    "50%": 66.4,
+    "75%": 98.7,
+    "max": 330.6
+  },
+  "numeric_target_correlations": {
+    "carbon_monoxide": 0.028775,
+    "nitrogen_dioxide": 0.320173,
+    "ozone": -0.247266,
+    "dust": 0.832091,
+    "hour": 0.162354,
+    "day_of_year": -0.328055
+  },
+  "potential_leakage_features": [],
+  "potentially_irrelevant_features": [],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

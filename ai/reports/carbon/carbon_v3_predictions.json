@@ -1,0 +1,71 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:08.082943+00:00",
+  "source": "ai\\carbon\\carbon_v3_predictions.csv",
+  "source_sha256": "d22b1efec4f5642d4a5049ddb5141620f48fca4d9983eddb51c55d41b25502c5",
+  "role": "derived_output",
+  "rows": 3000,
+  "columns": 3,
+  "feature_names": [
+    "actual_carbon_kg",
+    "predicted_carbon_kg",
+    "error_kg"
+  ],
+  "target_column": null,
+  "dtypes": {
+    "actual_carbon_kg": "float64",
+    "predicted_carbon_kg": "float64",
+    "error_kg": "float64"
+  },
+  "numeric_features": [
+    "actual_carbon_kg",
+    "predicted_carbon_kg",
+    "error_kg"
+  ],
+  "categorical_features": [],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "actual_carbon_kg": {
+      "unique_count": 2951
+    },
+    "predicted_carbon_kg": {
+      "unique_count": 3000
+    },
+    "error_kg": {
+      "unique_count": 3000
+    }
+  },
+  "outlier_analysis": {
+    "actual_carbon_kg": {
+      "method": "IQR",
+      "count": 116,
+      "lower": -223.83,
+      "upper": 1685.17
+    },
+    "predicted_carbon_kg": {
+      "method": "IQR",
+      "count": 122,
+      "lower": -186.682732,
+      "upper": 1647.320266
+    },
+    "error_kg": {
+      "method": "IQR",
+      "count": 132,
+      "lower": -119.038756,
+      "upper": 116.676921
+    }
+  },
+  "target_distribution": null,
+  "target_numeric_summary": null,
+  "numeric_target_correlations": {},
+  "potential_leakage_features": [
+    "actual_carbon_kg"
+  ],
+  "potentially_irrelevant_features": [],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

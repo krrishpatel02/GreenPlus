@@ -1,0 +1,98 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:09.636987+00:00",
+  "source": "ai\\energy\\energy_v1_model_comparison.csv",
+  "source_sha256": "b3e441c2fb3072e9c7d94caf0ac77f0e456870f2bfa8e6a88d667f5674f5ddc9",
+  "role": "derived_output",
+  "rows": 3,
+  "columns": 4,
+  "feature_names": [
+    "Unnamed: 0",
+    "MAE",
+    "RMSE",
+    "R2"
+  ],
+  "target_column": null,
+  "dtypes": {
+    "Unnamed: 0": "str",
+    "MAE": "float64",
+    "RMSE": "float64",
+    "R2": "float64"
+  },
+  "numeric_features": [
+    "MAE",
+    "RMSE",
+    "R2"
+  ],
+  "categorical_features": [
+    "Unnamed: 0"
+  ],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "Unnamed: 0": {
+      "unique_count": 3,
+      "top_values": {
+        "Random Forest": 1,
+        "Gradient Boosting": 1,
+        "Extra Trees": 1
+      }
+    },
+    "MAE": {
+      "unique_count": 3,
+      "top_values": {
+        "31.82368381048898": 1,
+        "37.09242843061493": 1,
+        "28.368401317456293": 1
+      }
+    },
+    "RMSE": {
+      "unique_count": 3,
+      "top_values": {
+        "66.76325836448989": 1,
+        "84.13315383829945": 1,
+        "61.33281567143289": 1
+      }
+    },
+    "R2": {
+      "unique_count": 3,
+      "top_values": {
+        "0.5545825829357829": 1,
+        "0.2926628219684329": 1,
+        "0.6240951298606728": 1
+      }
+    }
+  },
+  "outlier_analysis": {
+    "MAE": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 23.553022,
+      "upper": 41.001076
+    },
+    "RMSE": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 46.947783,
+      "upper": 92.54846
+    },
+    "R2": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 0.175048,
+      "upper": 0.837913
+    }
+  },
+  "target_distribution": null,
+  "target_numeric_summary": null,
+  "numeric_target_correlations": {},
+  "potential_leakage_features": [],
+  "potentially_irrelevant_features": [
+    "Unnamed: 0"
+  ],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

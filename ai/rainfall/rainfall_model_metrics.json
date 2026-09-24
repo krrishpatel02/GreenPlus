@@ -1,0 +1,23 @@
+{
+  "model": "HistGradientBoostingClassifier",
+  "dataset": "Open-Meteo historical archive",
+  "rows": 26304,
+  "location": "28.6139, 77.2090",
+  "features": [
+    "temperature_2m",
+    "relative_humidity_2m",
+    "cloud_cover",
+    "wind_speed_10m",
+    "pressure_msl",
+    "hour",
+    "day_of_year"
+  ],
+  "target": "rain_event",
+  "train_f1": 0.6216,
+  "test_f1": 0.535,
+  "test_accuracy": 0.7856,
+  "cv_f1_mean": 0.4755,
+  "cv_f1_std": 0.1399,
+  "overfit_gap": 0.0865,
+  "validation": "passed"
+}

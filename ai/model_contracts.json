@@ -1,0 +1,159 @@
+{
+  "contract_version": "1.0.0",
+  "created_at": "2026-09-14",
+  "random_seed": 42,
+  "models": {
+    "carbon": {
+      "status": "provisional_pending_target_provenance",
+      "dataset": "ai/carbon/carbonv3.csv",
+      "dataset_sha256": "616f1cc4b8f526de7feb89c56ead51945436064fbcbe990a0dd1ccd0334c2775",
+      "target": "carbon_emission_kg",
+      "task": "household carbon footprint regression",
+      "categorical_features": [
+        "location_type",
+        "climate_zone",
+        "diet_type"
+      ],
+      "numeric_features": [
+        "household_size",
+        "monthly_income",
+        "electricity_kwh",
+        "natural_gas_kwh",
+        "lpg_kg",
+        "solar_kwh",
+        "renewable_energy_percent",
+        "car_km",
+        "car_fuel_efficiency",
+        "petrol_liters",
+        "diesel_liters",
+        "motorcycle_km",
+        "ev_km",
+        "ev_charging_kwh",
+        "public_transport_percent",
+        "bus_km",
+        "train_km",
+        "flight_hours",
+        "flight_distance_km",
+        "beef_meals_month",
+        "dairy_servings_month",
+        "food_waste_kg",
+        "local_food_percent",
+        "total_waste_kg",
+        "recycled_waste_percent",
+        "composted_waste_percent",
+        "plastic_waste_kg",
+        "paper_waste_kg",
+        "home_size_sqft",
+        "ac_hours_month",
+        "heating_hours_month",
+        "shopping_trips_month",
+        "clothing_items_month",
+        "electronics_items_year",
+        "tree_planting_year"
+      ],
+      "excluded_features": [],
+      "preprocessing": {
+        "numeric_missing": "median fitted on training split only",
+        "categorical_missing": "most_frequent fitted on training split only",
+        "categorical_encoding": "OneHotEncoder(handle_unknown=ignore)",
+        "pipeline_required": true
+      },
+      "validation": {
+        "final_test": "20 percent holdout; group or temporal split required when household/time identifiers become available",
+        "cross_validation": "5-fold CV on training data",
+        "required_metrics": ["MAE", "RMSE", "R2"],
+        "required_checks": ["train_cv_test_gap", "segment_error", "robustness", "independent_emission_factor_comparison"]
+      },
+      "known_risks": [
+        "The target appears synthetic or formula-derived; feature-target provenance must be independently verified before calling this production-ready.",
+        "No household identifier is available, so group leakage cannot currently be tested.",
+        "Missingness is material and must be handled inside the fitted pipeline."
+      ]
+    },
+    "energy": {
+      "status": "ready_for_time_aware_revalidation",
+      "dataset": "ai/energy/energy.csv",
+      "dataset_sha256": "2820bf712ad0275cb18b85a05250926100d8e65ebb9f4d2d016ca91ea152a25d",
+      "target": "Appliances",
+      "task": "time-indexed appliance energy regression",
+      "raw_features": [
+        "lights",
+        "T1",
+        "RH_1",
+        "T2",
+        "RH_2",
+        "T3",
+        "RH_3",
+        "T4",
+        "RH_4",
+        "T5",
+        "RH_5",
+        "T6",
+        "RH_6",
+        "T7",
+        "RH_7",
+        "T8",
+        "RH_8",
+        "T9",
+        "RH_9",
+        "T_out",
+        "Press_mm_hg",
+        "RH_out",
+        "Windspeed",
+        "Visibility",
+        "Tdewpoint"
+      ],
+      "excluded_features": [
+        "date",
+        "rv1",
+        "rv2"
+      ],
+      "engineered_features": [
+        "hour",
+        "day_of_week",
+        "month",
+        "day",
+        "is_weekend",
+        "is_working_hour",
+        "is_morning",
+        "is_afternoon",
+        "is_evening",
+        "is_night",
+        "hour_sin",
+        "hour_cos",
+        "day_sin",
+        "day_cos",
+        "month_sin",
+        "month_cos",
+        "temperature_differences",
+        "humidity_differences",
+        "thermal_humidity_interactions",
+        "temperature_summary_statistics",
+        "humidity_summary_statistics"
+      ],
+      "preprocessing": {
+        "numeric_missing": "median fitted on training split only",
+        "pipeline_required": true,
+        "chronological_feature_engineering": true,
+        "future_or_target_derived_features": "forbidden unless calculated from past observations only"
+      },
+      "validation": {
+        "final_test": "latest chronological 20 percent",
+        "cross_validation": "TimeSeriesSplit with 5 folds on the training period",
+        "baselines": ["training_mean", "seasonal_naive_if_supported"],
+        "required_metrics": ["MAE", "RMSE", "R2"],
+        "required_checks": ["train_cv_test_gap", "temporal_error_by_period", "missing_input_robustness", "nonnegative_prediction"]
+      },
+      "known_risks": [
+        "The existing v2 script uses random splitting and must not be used as the final evaluation.",
+        "rv1 and rv2 have unique values but are duplicate random-noise channels and are excluded.",
+        "The current API hard-codes many sensor inputs; production inference should accept a validated feature contract."
+      ]
+    }
+  },
+  "deferred_components": {
+    "water": "No valid target dataset is currently available; collect meter or household usage observations first.",
+    "green_action": "Use transparent ranking/rules until real action adoption or feedback labels exist.",
+    "personalized_eco_advice": "Implement as a constrained recommendation layer over validated model outputs, not a fabricated standalone model."
+  }
+}

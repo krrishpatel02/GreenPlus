@@ -1,0 +1,42 @@
+{
+  "dataset": "Kaggle: sonalshinde123/personal-carbon-footprint-behavior-dataset",
+  "rows": 1400,
+  "features": [
+    "transport_mode",
+    "distance_km",
+    "electricity_kwh",
+    "renewable_usage_pct",
+    "food_type",
+    "waste_generated_kg"
+  ],
+  "targets": [
+    "unfccc_opportunity",
+    "cbd_opportunity",
+    "unccd_opportunity"
+  ],
+  "targets_metrics": {
+    "unfccc_opportunity": {
+      "train_r2": 0.9911,
+      "test_r2": 0.9807,
+      "test_mae": 0.0105,
+      "overfit_gap": 0.0103
+    },
+    "cbd_opportunity": {
+      "train_r2": 0.9997,
+      "test_r2": 0.9997,
+      "test_mae": 0.0028,
+      "overfit_gap": 0.0
+    },
+    "unccd_opportunity": {
+      "train_r2": 0.9989,
+      "test_r2": 0.9991,
+      "test_mae": 0.0024,
+      "overfit_gap": -0.0001
+    }
+  },
+  "cv_r2_mean": 0.9938,
+  "cv_r2_std": 0.0009,
+  "overfit_gap": 0.0103,
+  "fit_diagnosis": "balanced",
+  "validation": "passed"
+}

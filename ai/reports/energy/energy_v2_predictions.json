@@ -1,0 +1,71 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:09.772016+00:00",
+  "source": "ai\\energy\\energy_v2_predictions.csv",
+  "source_sha256": "e348d1971eb75125fb8b253abe12bc6db4f2c9e878e944f930e14a510bffac7c",
+  "role": "derived_output",
+  "rows": 3947,
+  "columns": 3,
+  "feature_names": [
+    "actual_appliances_energy",
+    "predicted_appliances_energy",
+    "absolute_error"
+  ],
+  "target_column": null,
+  "dtypes": {
+    "actual_appliances_energy": "int64",
+    "predicted_appliances_energy": "float64",
+    "absolute_error": "float64"
+  },
+  "numeric_features": [
+    "actual_appliances_energy",
+    "predicted_appliances_energy",
+    "absolute_error"
+  ],
+  "categorical_features": [],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "actual_appliances_energy": {
+      "unique_count": 75
+    },
+    "predicted_appliances_energy": {
+      "unique_count": 3947
+    },
+    "absolute_error": {
+      "unique_count": 3947
+    }
+  },
+  "outlier_analysis": {
+    "actual_appliances_energy": {
+      "method": "IQR",
+      "count": 424,
+      "lower": -25.0,
+      "upper": 175.0
+    },
+    "predicted_appliances_energy": {
+      "method": "IQR",
+      "count": 304,
+      "lower": -41.782661,
+      "upper": 210.486809
+    },
+    "absolute_error": {
+      "method": "IQR",
+      "count": 482,
+      "lower": -29.397515,
+      "upper": 61.267523
+    }
+  },
+  "target_distribution": null,
+  "target_numeric_summary": null,
+  "numeric_target_correlations": {},
+  "potential_leakage_features": [
+    "actual_appliances_energy"
+  ],
+  "potentially_irrelevant_features": [],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

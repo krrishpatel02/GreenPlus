@@ -3,10 +3,15 @@ import { useEco } from "../../context/EcoContext";
 import TeslaChart from "../../componentes/ui/TeslaChart";
 import DashboardSidebar from "../../componentes/dashboard/DashboardSidebar";
 import DashboardOverview from "../../componentes/dashboard/DashboardOverview";
+import PredictionModulesModal from "../../componentes/dashboard/PredictionModulesModal";
 import useDashboardNavigation from "../../hooks/useDashboardNavigation";
 import useDashboardMetrics from "../../hooks/useDashboardMetrics.jsx";
 import useDashboardFilters from "../../hooks/useDashboardFilters";
 import useRealtimeConnection from "../../hooks/useRealtimeConnection";
+import { assistantApi } from "../../services/api";
+import NotificationCenter from "../../componentes/dashboard/NotificationCenter";
+import VoiceAssistant from "../../componentes/dashboard/VoiceAssistant";
+import HelpCenter from "../../componentes/dashboard/HelpCenter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaBars,
@@ -156,12 +161,17 @@ const Dashboard = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [quizAnswered, setQuizAnswered] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
+  const [quizFinalScore, setQuizFinalScore] = useState(0);
   const [quizStep, setQuizStep] = useState("intro");
+  const [quizSaving, setQuizSaving] = useState(false);
+  const [quizError, setQuizError] = useState("");
 
   // Schemes Filter State
   const [schemeSearch, setSchemeSearch] = useState("");
   const [schemeCategoryFilter, setSchemeCategoryFilter] = useState("All");
   const [selectedSchemeDetail, setSelectedSchemeDetail] = useState(null);
+  const [selectedResearchModule, setSelectedResearchModule] = useState(null);
+  const [isModulesModalOpen, setIsModulesModalOpen] = useState(false);
   const [researchSearch, setResearchSearch] = useState("");
   const [researchModuleFilter, setResearchModuleFilter] = useState("All");
 
@@ -216,6 +226,8 @@ const Dashboard = () => {
     setSelectedOption(null);
     setQuizAnswered(false);
     setQuizScore(0);
+    setQuizFinalScore(0);
+    setQuizError("");
     setQuizStep("questions");
   };
 
@@ -237,55 +249,44 @@ const Dashboard = () => {
     if (currentQuestionIndex < activeQuiz.questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
-      const finalScorePct = (quizScore / activeQuiz.questions.length) * 100;
-      completeQuiz(activeQuiz.id, finalScorePct);
-      setQuizStep("summary");
+      const finalScore = quizScore + (selectedOption === activeQuiz.questions[currentQuestionIndex].answer ? 1 : 0);
+      const finalScorePct = (finalScore / activeQuiz.questions.length) * 100;
+      setQuizFinalScore(finalScorePct);
+      setQuizSaving(true);
+      setQuizError("");
+      Promise.resolve(completeQuiz(activeQuiz.id, finalScorePct, activeQuiz.xp))
+        .then((saved) => {
+          if (finalScorePct >= 60 && saved === false) {
+            setQuizError("This quiz was already completed or could not be saved. Your existing result is still safe.");
+          }
+          setQuizStep("summary");
+        })
+        .catch(() => setQuizError("Could not save this result. Check your connection and try again."))
+        .finally(() => setQuizSaving(false));
     }
   };
 
-  const handleSendChatMessage = (text) => {
-    if (!text.trim()) return;
+  const handleSendChatMessage = async (text) => {
+    const messageText = text.trim().slice(0, 500);
+    if (!messageText || isChatThinking) return;
 
-    const userMessage = { sender: "user", text };
+    const userMessage = { sender: "user", text: messageText };
     setChatMessages((prev) => [...prev, userMessage]);
     setChatInput("");
     setIsChatThinking(true);
-
-    setTimeout(() => {
-      const query = text.toLowerCase();
-      let replyText = "";
-
-      if (query.includes("rio") || query.includes("unfccc") || query.includes("cbd") || query.includes("unccd") || query.includes("treaty")) {
-        replyText =
-          "The Rio Trio refers to the 3 key treaties born at the 1992 Earth Summit: 1) UNFCCC for Climate Change (IPCC consensus), 2) CBD for Biodiversity preservation (30x30 target), and 3) UNCCD to fight Desertification & Soil erosion. You can take our Rio Trio Quizzes in the Learning Center! 🌍📜";
-      } else if (query.includes("methane") || query.includes("ch4") || query.includes("cow") || query.includes("diet") || query.includes("livestock")) {
-        replyText =
-          "Methane (CH4) is 80x more potent than CO2 over 20 years. About 40% comes from agriculture (ruminant enteric fermentation & landfills). Switching to plant-based meals and composting organic waste directly cuts methane! Take a look at our Methane Tracker tab. 🐮🍃";
-      } else if (
-        query.includes("solar") ||
-        query.includes("panel") ||
-        query.includes("electric") ||
-        query.includes("energy") ||
-        query.includes("net metering")
-      ) {
-        replyText =
-          "Solar energy is a game-changer! You can generate your own power, save on utility bills, and get up to 30% tax credits (check our Green Schemes tab). I recommend starting with the Solar Basics quiz in the Learning Center to earn 50 XP! ⚡☀️";
-      } else if (
-        query.includes("water") ||
-        query.includes("greywater") ||
-        query.includes("rainwater") ||
-        query.includes("shower")
-      ) {
-        replyText =
-          "Conserving water is vital. Quick tips: restrict shower times to 5 minutes (saves ~40L), reuse kitchen rinse water for backyard soil, and check if your local utility offers rainwater tank subsidies. Log your savings today to gain XP! 💧🏺";
-      } else {
-        replyText =
-          "That is a great question! Living sustainably is a journey of small daily habits supported by peer-reviewed research. Try completing today's eco-checklist, or ask me about 'Rio Trio treaties', 'Methane reduction', or 'Solar rebates'! 🌿";
-      }
-
-      setChatMessages((prev) => [...prev, { sender: "leafy", text: replyText }]);
+    try {
+      const history = chatMessages.filter((message) => message.intent).slice(-5);
+      const response = await assistantApi.message({
+        message: messageText,
+        history,
+        context: { userContext: { solarAvailable: energyLogs.some((log) => log.solarEnergy > 0) } },
+      });
+      setChatMessages((prev) => [...prev, { sender: "leafy", text: response.reply, intent: response.intent }]);
+    } catch (requestError) {
+      setChatMessages((prev) => [...prev, { sender: "leafy", text: requestError.message || "I could not reach Leafy right now. Please try again." }]);
+    } finally {
       setIsChatThinking(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -354,6 +355,7 @@ const Dashboard = () => {
             overviewModules={overviewModules}
             claimStreakBonus={claimStreakBonus}
             setActiveTab={setActiveTab}
+            onOpenModules={() => setIsModulesModalOpen(true)}
             realtimeStatus={realtimeStatus}
           />
         )}
@@ -798,13 +800,15 @@ const Dashboard = () => {
                     <div className="max-w-md mx-auto p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
                       <span className="block text-xs text-emerald-700 font-extrabold uppercase tracking-wider">Score Achieved</span>
                       <span className="text-4xl font-extrabold text-emerald-950 font-mono">
-                        {Math.round((quizScore / activeQuiz.questions.length) * 100)}%
+                        {Math.round(quizFinalScore)}%
                       </span>
                       <span className="text-xs text-slate-500 block mt-2 leading-relaxed">
-                        {quizScore === activeQuiz.questions.length
+                        {quizFinalScore === 100
                           ? "Flawless score! Unlocked research points."
                           : "Nice effort! You've learned core practices. Complete again for 100%!"}
                       </span>
+                      {quizSaving && <span className="text-xs text-emerald-700 block mt-2">Saving your result...</span>}
+                      {quizError && <span className="text-xs text-amber-700 block mt-2">{quizError}</span>}
                     </div>
 
                     <button
@@ -897,6 +901,15 @@ const Dashboard = () => {
                 <motion.article
                   className="dashboard-research__card dashboard-focus-row"
                   key={module.number}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedResearchModule(module)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setSelectedResearchModule(module);
+                    }
+                  }}
                   initial={{ opacity: 0.45, scale: 0.97, borderColor: "rgba(63, 63, 70, 0.45)" }}
                   whileInView={{ opacity: 1, scale: 1, borderColor: "rgba(184, 243, 107, 0.55)" }}
                   viewport={{ amount: 0.7, margin: "-12% 0px -12%" }}
@@ -910,7 +923,7 @@ const Dashboard = () => {
                   <p>{module.summary}</p>
                   <div className="dashboard-research__sources">
                     {module.sources.map(([title, url]) => (
-                      <a key={url} href={url} target="_blank" rel="noreferrer">
+                      <a key={url} href={url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}>
                         <span>{title}</span><FaShareSquare />
                       </a>
                     ))}
@@ -935,10 +948,10 @@ const Dashboard = () => {
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>
                   <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <FaDatabase className="text-emerald-500" /> Notion Eco-Schemes Database (Multi-Criteria SDGs)
+                    <FaDatabase className="text-emerald-500" /> India Eco-Schemes Database (Multi-Criteria SDGs)
                   </h3>
                   <p className="text-xs text-slate-400 mt-1">
-                    Multi-criteria recommendation engine matching SDG goals (SDG 6, SDG 7, SDG 12, SDG 13).
+                    National Indian programmes plus local-style sustainability incentives, matched to SDG goals. Always verify current eligibility on the official portal.
                   </p>
                 </div>
               </div>
@@ -967,6 +980,9 @@ const Dashboard = () => {
                     <option value="Transport">Transport</option>
                     <option value="Energy Efficiency">Energy Efficiency</option>
                     <option value="Water Conservation">Water Conservation</option>
+                    <option value="Agriculture & Solar">Agriculture & Solar</option>
+                    <option value="Waste Management">Waste Management</option>
+                    <option value="Climate & Biodiversity">Climate & Biodiversity</option>
                   </select>
                 </div>
               </div>
@@ -991,7 +1007,7 @@ const Dashboard = () => {
                       return (
                         <tr key={sch.id} className="hover:bg-slate-50/50 transition">
                           <td className="px-6 py-4 font-bold text-slate-900 cursor-pointer" onClick={() => setSelectedSchemeDetail(sch)}>
-                            {sch.title}
+                            <span className="flex items-center gap-2">{sch.title}<span className="text-[9px] uppercase tracking-wide text-blue-700 bg-blue-50 border border-blue-100 rounded px-1.5 py-0.5">Official source</span></span>
                           </td>
                           <td className="px-6 py-4 space-y-1">
                             <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 block w-fit">
@@ -1047,7 +1063,9 @@ const Dashboard = () => {
 
         {/* ==================== AI ASSISTANT TAB ==================== */}
         {activeTab === "ai" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
+          <div className="space-y-8 animate-fadeIn">
+            <NotificationCenter />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col h-[520px]">
               <div className="p-5 border-b border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1055,6 +1073,10 @@ const Dashboard = () => {
                   <h3 className="font-bold text-slate-900 text-sm">Leafy AI Eco Assistant (LLM Nudges)</h3>
                 </div>
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">AI Powered</span>
+              </div>
+              <div className="px-5 py-2 border-b border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500">Talk to Leafy or listen to the latest reply</span>
+                <VoiceAssistant onTranscript={handleSendChatMessage} replyText={[...chatMessages].reverse().find((message) => message.sender === "leafy")?.text} disabled={isChatThinking} />
               </div>
 
               <div className="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col">
@@ -1106,11 +1128,14 @@ const Dashboard = () => {
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
+                  maxLength={500}
+                  disabled={isChatThinking}
                   placeholder="Ask Leafy about solar, Rio Trio treaties, water, methane..."
                   className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm text-slate-800"
                 />
                 <button
                   type="submit"
+                  disabled={isChatThinking || !chatInput.trim()}
                   className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl shadow-[0_3px_0_0_#059669] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer text-xs"
                 >
                   Send
@@ -1147,6 +1172,7 @@ const Dashboard = () => {
                   Leafy AI uses field-validated research models to provide personalized recommendations.
                 </div>
               </div>
+            </div>
             </div>
           </div>
         )}
@@ -1227,8 +1253,69 @@ const Dashboard = () => {
           </div>
         )}
 
+        {activeTab === "help" && <HelpCenter />}
+
         {/* Scheme Detail Modal */}
         <AnimatePresence>
+          {isModulesModalOpen && (
+            <PredictionModulesModal onClose={() => setIsModulesModalOpen(false)} onOpenTab={setActiveTab} />
+          )}
+
+          {selectedResearchModule && (
+            <div
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+              role="presentation"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget) setSelectedResearchModule(null);
+              }}
+            >
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="research-module-title"
+                initial={{ opacity: 0, y: 16, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 16, scale: 0.97 }}
+                className="bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 md:p-8 max-w-2xl w-full max-h-[85vh] overflow-y-auto space-y-6"
+              >
+                <div className="flex justify-between items-start gap-4">
+                  <div>
+                    <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-600">Module {selectedResearchModule.number}</span>
+                    <h3 id="research-module-title" className="text-2xl font-extrabold text-slate-900 mt-2">{selectedResearchModule.title}</h3>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Close research module"
+                    onClick={() => setSelectedResearchModule(null)}
+                    className="p-2 text-slate-400 hover:text-slate-700 text-lg font-bold rounded-xl hover:bg-slate-50 transition"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <p className="text-sm leading-relaxed text-slate-600">{selectedResearchModule.summary}</p>
+
+                <div>
+                  <h4 className="text-xs text-slate-400 font-extrabold uppercase tracking-wider mb-3">Research sources</h4>
+                  <div className="space-y-2">
+                    {selectedResearchModule.sources.map(([title, url]) => (
+                      <a
+                        key={url}
+                        href={url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-between gap-4 p-3 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/40 text-sm font-semibold text-slate-700 transition"
+                      >
+                        <span>{title}</span>
+                        <FaShareSquare className="shrink-0 text-emerald-500" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+
           {selectedSchemeDetail && (
             <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6">
               <motion.div
@@ -1258,6 +1345,10 @@ const Dashboard = () => {
                     <span className="text-slate-900 font-semibold">{selectedSchemeDetail.authority}</span>
                   </div>
                   <div>
+                    <span className="block text-xs text-slate-400 font-bold uppercase">Source status</span>
+                    <span className="text-blue-700 font-semibold">Official government programme portal</span>
+                  </div>
+                  <div>
                     <span className="block text-xs text-slate-400 font-bold uppercase">Reward Details</span>
                     <span className="text-emerald-600 font-extrabold">{selectedSchemeDetail.reward}</span>
                   </div>
@@ -1265,6 +1356,12 @@ const Dashboard = () => {
                     <span className="block text-xs text-slate-400 font-bold uppercase">Description</span>
                     <p className="leading-relaxed mt-1 text-slate-500">{selectedSchemeDetail.desc}</p>
                   </div>
+                  {selectedSchemeDetail.eligibility && (
+                    <div>
+                      <span className="block text-xs text-slate-400 font-bold uppercase">Eligibility note</span>
+                      <p className="leading-relaxed mt-1 text-slate-500">{selectedSchemeDetail.eligibility}</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-3 pt-4">
@@ -1281,7 +1378,7 @@ const Dashboard = () => {
                     {bookmarkedSchemes.includes(selectedSchemeDetail.id) ? "Bookmarked ✓" : "Bookmark Scheme"}
                   </button>
                   <a
-                    href="https://www.energy.gov"
+                    href={selectedSchemeDetail.sourceUrl || "https://www.india.gov.in/"}
                     target="_blank"
                     rel="noreferrer"
                     className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm rounded-xl text-center shadow-[0_3px_0_0_#059669] active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"

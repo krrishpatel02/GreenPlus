@@ -1,0 +1,754 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:08.506953+00:00",
+  "source": "ai\\carbon\\carbonv3.csv",
+  "source_sha256": "616f1cc4b8f526de7feb89c56ead51945436064fbcbe990a0dd1ccd0334c2775",
+  "role": "dataset_candidate",
+  "rows": 15000,
+  "columns": 39,
+  "feature_names": [
+    "location_type",
+    "climate_zone",
+    "household_size",
+    "monthly_income",
+    "electricity_kwh",
+    "natural_gas_kwh",
+    "lpg_kg",
+    "solar_kwh",
+    "renewable_energy_percent",
+    "car_km",
+    "car_fuel_efficiency",
+    "petrol_liters",
+    "diesel_liters",
+    "motorcycle_km",
+    "ev_km",
+    "ev_charging_kwh",
+    "public_transport_percent",
+    "bus_km",
+    "train_km",
+    "flight_hours",
+    "flight_distance_km",
+    "diet_type",
+    "beef_meals_month",
+    "dairy_servings_month",
+    "food_waste_kg",
+    "local_food_percent",
+    "total_waste_kg",
+    "recycled_waste_percent",
+    "composted_waste_percent",
+    "plastic_waste_kg",
+    "paper_waste_kg",
+    "home_size_sqft",
+    "ac_hours_month",
+    "heating_hours_month",
+    "shopping_trips_month",
+    "clothing_items_month",
+    "electronics_items_year",
+    "tree_planting_year",
+    "carbon_emission_kg"
+  ],
+  "target_column": "carbon_emission_kg",
+  "dtypes": {
+    "location_type": "str",
+    "climate_zone": "str",
+    "household_size": "float64",
+    "monthly_income": "float64",
+    "electricity_kwh": "float64",
+    "natural_gas_kwh": "float64",
+    "lpg_kg": "float64",
+    "solar_kwh": "float64",
+    "renewable_energy_percent": "float64",
+    "car_km": "float64",
+    "car_fuel_efficiency": "float64",
+    "petrol_liters": "float64",
+    "diesel_liters": "float64",
+    "motorcycle_km": "float64",
+    "ev_km": "float64",
+    "ev_charging_kwh": "float64",
+    "public_transport_percent": "float64",
+    "bus_km": "float64",
+    "train_km": "float64",
+    "flight_hours": "float64",
+    "flight_distance_km": "float64",
+    "diet_type": "str",
+    "beef_meals_month": "float64",
+    "dairy_servings_month": "float64",
+    "food_waste_kg": "float64",
+    "local_food_percent": "float64",
+    "total_waste_kg": "float64",
+    "recycled_waste_percent": "float64",
+    "composted_waste_percent": "float64",
+    "plastic_waste_kg": "float64",
+    "paper_waste_kg": "float64",
+    "home_size_sqft": "float64",
+    "ac_hours_month": "float64",
+    "heating_hours_month": "float64",
+    "shopping_trips_month": "float64",
+    "clothing_items_month": "float64",
+    "electronics_items_year": "float64",
+    "tree_planting_year": "float64",
+    "carbon_emission_kg": "float64"
+  },
+  "numeric_features": [
+    "household_size",
+    "monthly_income",
+    "electricity_kwh",
+    "natural_gas_kwh",
+    "lpg_kg",
+    "solar_kwh",
+    "renewable_energy_percent",
+    "car_km",
+    "car_fuel_efficiency",
+    "petrol_liters",
+    "diesel_liters",
+    "motorcycle_km",
+    "ev_km",
+    "ev_charging_kwh",
+    "public_transport_percent",
+    "bus_km",
+    "train_km",
+    "flight_hours",
+    "flight_distance_km",
+    "beef_meals_month",
+    "dairy_servings_month",
+    "food_waste_kg",
+    "local_food_percent",
+    "total_waste_kg",
+    "recycled_waste_percent",
+    "composted_waste_percent",
+    "plastic_waste_kg",
+    "paper_waste_kg",
+    "home_size_sqft",
+    "ac_hours_month",
+    "heating_hours_month",
+    "shopping_trips_month",
+    "clothing_items_month",
+    "electronics_items_year",
+    "tree_planting_year",
+    "carbon_emission_kg"
+  ],
+  "categorical_features": [
+    "location_type",
+    "climate_zone",
+    "diet_type"
+  ],
+  "missing_values": {
+    "location_type": {
+      "count": 512,
+      "percent": 3.4133
+    },
+    "climate_zone": {
+      "count": 411,
+      "percent": 2.74
+    },
+    "household_size": {
+      "count": 340,
+      "percent": 2.2667
+    },
+    "monthly_income": {
+      "count": 486,
+      "percent": 3.24
+    },
+    "electricity_kwh": {
+      "count": 535,
+      "percent": 3.5667
+    },
+    "natural_gas_kwh": {
+      "count": 696,
+      "percent": 4.64
+    },
+    "lpg_kg": {
+      "count": 652,
+      "percent": 4.3467
+    },
+    "solar_kwh": {
+      "count": 274,
+      "percent": 1.8267
+    },
+    "renewable_energy_percent": {
+      "count": 639,
+      "percent": 4.26
+    },
+    "car_km": {
+      "count": 378,
+      "percent": 2.52
+    },
+    "car_fuel_efficiency": {
+      "count": 725,
+      "percent": 4.8333
+    },
+    "petrol_liters": {
+      "count": 358,
+      "percent": 2.3867
+    },
+    "diesel_liters": {
+      "count": 513,
+      "percent": 3.42
+    },
+    "motorcycle_km": {
+      "count": 501,
+      "percent": 3.34
+    },
+    "ev_km": {
+      "count": 420,
+      "percent": 2.8
+    },
+    "ev_charging_kwh": {
+      "count": 560,
+      "percent": 3.7333
+    },
+    "public_transport_percent": {
+      "count": 305,
+      "percent": 2.0333
+    },
+    "bus_km": {
+      "count": 715,
+      "percent": 4.7667
+    },
+    "train_km": {
+      "count": 571,
+      "percent": 3.8067
+    },
+    "flight_hours": {
+      "count": 497,
+      "percent": 3.3133
+    },
+    "flight_distance_km": {
+      "count": 490,
+      "percent": 3.2667
+    },
+    "diet_type": {
+      "count": 476,
+      "percent": 3.1733
+    },
+    "beef_meals_month": {
+      "count": 658,
+      "percent": 4.3867
+    },
+    "dairy_servings_month": {
+      "count": 491,
+      "percent": 3.2733
+    },
+    "food_waste_kg": {
+      "count": 445,
+      "percent": 2.9667
+    },
+    "local_food_percent": {
+      "count": 283,
+      "percent": 1.8867
+    },
+    "total_waste_kg": {
+      "count": 591,
+      "percent": 3.94
+    },
+    "recycled_waste_percent": {
+      "count": 474,
+      "percent": 3.16
+    },
+    "composted_waste_percent": {
+      "count": 403,
+      "percent": 2.6867
+    },
+    "plastic_waste_kg": {
+      "count": 435,
+      "percent": 2.9
+    },
+    "paper_waste_kg": {
+      "count": 651,
+      "percent": 4.34
+    },
+    "home_size_sqft": {
+      "count": 244,
+      "percent": 1.6267
+    },
+    "ac_hours_month": {
+      "count": 451,
+      "percent": 3.0067
+    },
+    "heating_hours_month": {
+      "count": 391,
+      "percent": 2.6067
+    },
+    "shopping_trips_month": {
+      "count": 372,
+      "percent": 2.48
+    },
+    "clothing_items_month": {
+      "count": 626,
+      "percent": 4.1733
+    },
+    "electronics_items_year": {
+      "count": 597,
+      "percent": 3.98
+    },
+    "tree_planting_year": {
+      "count": 439,
+      "percent": 2.9267
+    }
+  },
+  "duplicate_records": 0,
+  "unique_values": {
+    "location_type": {
+      "unique_count": 3,
+      "top_values": {
+        "urban": 7969,
+        "suburban": 3670,
+        "rural": 2849
+      }
+    },
+    "climate_zone": {
+      "unique_count": 3,
+      "top_values": {
+        "hot": 7206,
+        "moderate": 5162,
+        "cool": 2221
+      }
+    },
+    "household_size": {
+      "unique_count": 7,
+      "top_values": {
+        "2.0": 3212,
+        "3.0": 2857,
+        "4.0": 2744,
+        "1.0": 2229,
+        "5.0": 1768,
+        "6.0": 1117,
+        "7.0": 733
+      }
+    },
+    "monthly_income": {
+      "unique_count": 14336
+    },
+    "electricity_kwh": {
+      "unique_count": 12092
+    },
+    "natural_gas_kwh": {
+      "unique_count": 9615
+    },
+    "lpg_kg": {
+      "unique_count": 2583
+    },
+    "solar_kwh": {
+      "unique_count": 3463
+    },
+    "renewable_energy_percent": {
+      "unique_count": 3096
+    },
+    "car_km": {
+      "unique_count": 7773
+    },
+    "car_fuel_efficiency": {
+      "unique_count": 1529
+    },
+    "petrol_liters": {
+      "unique_count": 4034
+    },
+    "diesel_liters": {
+      "unique_count": 2871
+    },
+    "motorcycle_km": {
+      "unique_count": 7551
+    },
+    "ev_km": {
+      "unique_count": 1683
+    },
+    "ev_charging_kwh": {
+      "unique_count": 1614
+    },
+    "public_transport_percent": {
+      "unique_count": 6379
+    },
+    "bus_km": {
+      "unique_count": 10750
+    },
+    "train_km": {
+      "unique_count": 10934
+    },
+    "flight_hours": {
+      "unique_count": 1313
+    },
+    "flight_distance_km": {
+      "unique_count": 14273
+    },
+    "diet_type": {
+      "unique_count": 4,
+      "top_values": {
+        "mixed": 6536,
+        "vegetarian": 3900,
+        "non_vegetarian": 2914,
+        "vegan": 1174
+      }
+    },
+    "beef_meals_month": {
+      "unique_count": 19,
+      "top_values": {
+        "0.0": 5337,
+        "3.0": 1565,
+        "2.0": 1506,
+        "4.0": 1338,
+        "5.0": 1025,
+        "1.0": 1004,
+        "6.0": 752,
+        "7.0": 570,
+        "8.0": 429,
+        "9.0": 313
+      }
+    },
+    "dairy_servings_month": {
+      "unique_count": 36
+    },
+    "food_waste_kg": {
+      "unique_count": 2060
+    },
+    "local_food_percent": {
+      "unique_count": 6460
+    },
+    "total_waste_kg": {
+      "unique_count": 4087
+    },
+    "recycled_waste_percent": {
+      "unique_count": 6545
+    },
+    "composted_waste_percent": {
+      "unique_count": 5183
+    },
+    "plastic_waste_kg": {
+      "unique_count": 1162
+    },
+    "paper_waste_kg": {
+      "unique_count": 953
+    },
+    "home_size_sqft": {
+      "unique_count": 13831
+    },
+    "ac_hours_month": {
+      "unique_count": 9731
+    },
+    "heating_hours_month": {
+      "unique_count": 3744
+    },
+    "shopping_trips_month": {
+      "unique_count": 23
+    },
+    "clothing_items_month": {
+      "unique_count": 15,
+      "top_values": {
+        "1.0": 3716,
+        "2.0": 3481,
+        "3.0": 2335,
+        "0.0": 2107,
+        "4.0": 1296,
+        "5.0": 726,
+        "6.0": 365,
+        "7.0": 172,
+        "8.0": 79,
+        "9.0": 46
+      }
+    },
+    "electronics_items_year": {
+      "unique_count": 15,
+      "top_values": {
+        "0.0": 5459,
+        "1.0": 4426,
+        "2.0": 2334,
+        "3.0": 1171,
+        "4.0": 523,
+        "5.0": 222,
+        "6.0": 130,
+        "7.0": 59,
+        "8.0": 44,
+        "9.0": 16
+      }
+    },
+    "tree_planting_year": {
+      "unique_count": 7,
+      "top_values": {
+        "1.0": 5485,
+        "0.0": 5204,
+        "2.0": 2705,
+        "3.0": 907,
+        "4.0": 211,
+        "5.0": 48,
+        "6.0": 1
+      }
+    },
+    "carbon_emission_kg": {
+      "unique_count": 14033
+    }
+  },
+  "outlier_analysis": {
+    "household_size": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -1.0,
+      "upper": 7.0
+    },
+    "monthly_income": {
+      "method": "IQR",
+      "count": 826,
+      "lower": -44729.99375,
+      "upper": 146864.47625
+    },
+    "electricity_kwh": {
+      "method": "IQR",
+      "count": 439,
+      "lower": -60.4,
+      "upper": 555.92
+    },
+    "natural_gas_kwh": {
+      "method": "IQR",
+      "count": 1202,
+      "lower": -98.1025,
+      "upper": 221.0775
+    },
+    "lpg_kg": {
+      "method": "IQR",
+      "count": 426,
+      "lower": -7.39,
+      "upper": 23.89
+    },
+    "solar_kwh": {
+      "method": "IQR",
+      "count": 3657,
+      "lower": 0.0,
+      "upper": 0.0
+    },
+    "renewable_energy_percent": {
+      "method": "IQR",
+      "count": 3135,
+      "lower": -18.375,
+      "upper": 30.625
+    },
+    "car_km": {
+      "method": "IQR",
+      "count": 510,
+      "lower": -721.545,
+      "upper": 1202.575
+    },
+    "car_fuel_efficiency": {
+      "method": "IQR",
+      "count": 49,
+      "lower": 6.77,
+      "upper": 23.25
+    },
+    "petrol_liters": {
+      "method": "IQR",
+      "count": 648,
+      "lower": -31.61625,
+      "upper": 52.69375
+    },
+    "diesel_liters": {
+      "method": "IQR",
+      "count": 750,
+      "lower": -16.335,
+      "upper": 27.225
+    },
+    "motorcycle_km": {
+      "method": "IQR",
+      "count": 828,
+      "lower": -415.9875,
+      "upper": 693.3125
+    },
+    "ev_km": {
+      "method": "IQR",
+      "count": 1709,
+      "lower": 0.0,
+      "upper": 0.0
+    },
+    "ev_charging_kwh": {
+      "method": "IQR",
+      "count": 1694,
+      "lower": 0.0,
+      "upper": 0.0
+    },
+    "public_transport_percent": {
+      "method": "IQR",
+      "count": 64,
+      "lower": -27.5675,
+      "upper": 93.6925
+    },
+    "bus_km": {
+      "method": "IQR",
+      "count": 857,
+      "lower": -157.54,
+      "upper": 367.5
+    },
+    "train_km": {
+      "method": "IQR",
+      "count": 1245,
+      "lower": -157.89,
+      "upper": 362.27
+    },
+    "flight_hours": {
+      "method": "IQR",
+      "count": 703,
+      "lower": -3.93,
+      "upper": 8.79
+    },
+    "flight_distance_km": {
+      "method": "IQR",
+      "count": 694,
+      "lower": -2914.2275,
+      "upper": 6533.8525
+    },
+    "beef_meals_month": {
+      "method": "IQR",
+      "count": 73,
+      "lower": -7.5,
+      "upper": 12.5
+    },
+    "dairy_servings_month": {
+      "method": "IQR",
+      "count": 1222,
+      "lower": 5.5,
+      "upper": 33.5
+    },
+    "food_waste_kg": {
+      "method": "IQR",
+      "count": 738,
+      "lower": -6.29,
+      "upper": 15.71
+    },
+    "local_food_percent": {
+      "method": "IQR",
+      "count": 57,
+      "lower": 1.345,
+      "upper": 108.585
+    },
+    "total_waste_kg": {
+      "method": "IQR",
+      "count": 637,
+      "lower": -15.87,
+      "upper": 44.93
+    },
+    "recycled_waste_percent": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 0.09625,
+      "upper": 120.88625
+    },
+    "composted_waste_percent": {
+      "method": "IQR",
+      "count": 39,
+      "lower": -16.285,
+      "upper": 68.555
+    },
+    "plastic_waste_kg": {
+      "method": "IQR",
+      "count": 716,
+      "lower": -2.9,
+      "upper": 7.58
+    },
+    "paper_waste_kg": {
+      "method": "IQR",
+      "count": 831,
+      "lower": -2.185,
+      "upper": 5.695
+    },
+    "home_size_sqft": {
+      "method": "IQR",
+      "count": 49,
+      "lower": -86.68125,
+      "upper": 2276.18875
+    },
+    "ac_hours_month": {
+      "method": "IQR",
+      "count": 207,
+      "lower": -148.89,
+      "upper": 295.03
+    },
+    "heating_hours_month": {
+      "method": "IQR",
+      "count": 2274,
+      "lower": -10.735,
+      "upper": 20.905
+    },
+    "shopping_trips_month": {
+      "method": "IQR",
+      "count": 625,
+      "lower": -2.0,
+      "upper": 6.0
+    },
+    "clothing_items_month": {
+      "method": "IQR",
+      "count": 348,
+      "lower": -2.0,
+      "upper": 6.0
+    },
+    "electronics_items_year": {
+      "method": "IQR",
+      "count": 268,
+      "lower": -3.0,
+      "upper": 5.0
+    },
+    "tree_planting_year": {
+      "method": "IQR",
+      "count": 1,
+      "lower": -3.0,
+      "upper": 5.0
+    },
+    "carbon_emission_kg": {
+      "method": "IQR",
+      "count": 602,
+      "lower": -209.40125,
+      "upper": 1678.26875
+    }
+  },
+  "target_distribution": {
+    "unique_count": 14033
+  },
+  "target_numeric_summary": {
+    "count": 15000.0,
+    "mean": 785.731635,
+    "std": 420.110307,
+    "min": 20.0,
+    "25%": 498.475,
+    "50%": 689.255,
+    "75%": 970.3925,
+    "max": 4087.42
+  },
+  "numeric_target_correlations": {
+    "household_size": 0.159042,
+    "monthly_income": 0.010608,
+    "electricity_kwh": 0.23759,
+    "natural_gas_kwh": 0.044122,
+    "lpg_kg": 0.04218,
+    "solar_kwh": -0.160252,
+    "renewable_energy_percent": -0.173336,
+    "car_km": 0.156297,
+    "car_fuel_efficiency": -0.024551,
+    "petrol_liters": 0.161093,
+    "diesel_liters": 0.150959,
+    "motorcycle_km": 0.060777,
+    "ev_km": 0.052616,
+    "ev_charging_kwh": 0.056582,
+    "public_transport_percent": 0.012334,
+    "bus_km": 0.015435,
+    "train_km": 0.014745,
+    "flight_hours": 0.921342,
+    "flight_distance_km": 0.927761,
+    "beef_meals_month": 0.08898,
+    "dairy_servings_month": 0.021348,
+    "food_waste_kg": 0.106542,
+    "local_food_percent": -0.007741,
+    "total_waste_kg": 0.099957,
+    "recycled_waste_percent": -0.007021,
+    "composted_waste_percent": -0.002726,
+    "plastic_waste_kg": 0.091242,
+    "paper_waste_kg": 0.078317,
+    "home_size_sqft": 0.112536,
+    "ac_hours_month": 0.0755,
+    "heating_hours_month": 0.031586,
+    "shopping_trips_month": 0.017667,
+    "clothing_items_month": 0.013095,
+    "electronics_items_year": 0.010938,
+    "tree_planting_year": -0.029615
+  },
+  "potential_leakage_features": [],
+  "potentially_irrelevant_features": [],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

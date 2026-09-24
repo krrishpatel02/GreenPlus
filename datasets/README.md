@@ -6,7 +6,7 @@ This folder is the source-data catalog for model training and evaluation. Runtim
 
 | Dataset | Purpose | Model | Location |
 |---|---|---|---|
-| Carbon household data | Monthly household carbon emissions | Carbon v3 | `ai/carbon/carbon.csv` |
+| Carbon household data | Monthly household carbon emissions | Carbon v3 | `ai/carbon/carbonv3.csv` |
 | Energy appliance data | Appliance energy consumption and sensor features | Energy v2 | `ai/energy/energy.csv` |
 
 ## Data Rules

@@ -1,0 +1,52 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:09.722761+00:00",
+  "source": "ai\\energy\\energy_v2_feature_importance.csv",
+  "source_sha256": "9e3147fd1514a516f16e8af54ef1747549f8d2a1cf221c58b1289f1117fd487e",
+  "role": "derived_output",
+  "rows": 58,
+  "columns": 2,
+  "feature_names": [
+    "feature",
+    "importance"
+  ],
+  "target_column": null,
+  "dtypes": {
+    "feature": "str",
+    "importance": "float64"
+  },
+  "numeric_features": [
+    "importance"
+  ],
+  "categorical_features": [
+    "feature"
+  ],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "feature": {
+      "unique_count": 58
+    },
+    "importance": {
+      "unique_count": 58
+    }
+  },
+  "outlier_analysis": {
+    "importance": {
+      "method": "IQR",
+      "count": 15,
+      "lower": 0.011716,
+      "upper": 0.020217
+    }
+  },
+  "target_distribution": null,
+  "target_numeric_summary": null,
+  "numeric_target_correlations": {},
+  "potential_leakage_features": [],
+  "potentially_irrelevant_features": [],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

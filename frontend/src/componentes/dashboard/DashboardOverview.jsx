@@ -11,6 +11,7 @@ const DashboardOverview = ({
   overviewModules,
   claimStreakBonus,
   setActiveTab,
+  onOpenModules,
   realtimeStatus,
 }) => (
   <motion.div
@@ -114,6 +115,7 @@ const DashboardOverview = ({
 
     <motion.div className="dashboard-module-launcher col-span-full" variants={dashboardRipple}>
       <div><span className="dashboard-module-launcher__eyebrow">Workspace modules</span><h3>Continue your green work</h3></div>
+      <button type="button" onClick={onOpenModules} className="profile-reset-button dashboard-nudge-button rounded-xl bg-emerald-500 px-4 py-2 text-xs font-bold text-white transition hover:bg-emerald-400">View all 7 modules</button>
       <div className="dashboard-module-launcher__actions">
         {overviewModules.map(([id, label, icon]) => (
           <motion.button key={id} onClick={() => setActiveTab(id)} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }} className="dashboard-module-launcher__button"><span>{icon}</span>{label}<FaAngleRight /></motion.button>

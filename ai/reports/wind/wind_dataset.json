@@ -1,0 +1,142 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:10.583560+00:00",
+  "source": "ai\\wind\\wind_dataset.csv",
+  "source_sha256": "843a1800b0d7eb4a67709be71c5645132b57dfed3791fa5201758da4e57b4dc2",
+  "role": "dataset_candidate",
+  "rows": 26304,
+  "columns": 8,
+  "feature_names": [
+    "time",
+    "temperature_2m",
+    "relative_humidity_2m",
+    "cloud_cover",
+    "pressure_msl",
+    "wind_speed_10m",
+    "hour",
+    "day_of_year"
+  ],
+  "target_column": "wind_speed_10m",
+  "dtypes": {
+    "time": "str",
+    "temperature_2m": "float64",
+    "relative_humidity_2m": "int64",
+    "cloud_cover": "int64",
+    "pressure_msl": "float64",
+    "wind_speed_10m": "float64",
+    "hour": "int64",
+    "day_of_year": "int64"
+  },
+  "numeric_features": [
+    "temperature_2m",
+    "relative_humidity_2m",
+    "cloud_cover",
+    "pressure_msl",
+    "wind_speed_10m",
+    "hour",
+    "day_of_year"
+  ],
+  "categorical_features": [
+    "time"
+  ],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "time": {
+      "unique_count": 26304
+    },
+    "temperature_2m": {
+      "unique_count": 426
+    },
+    "relative_humidity_2m": {
+      "unique_count": 97
+    },
+    "cloud_cover": {
+      "unique_count": 101
+    },
+    "pressure_msl": {
+      "unique_count": 363
+    },
+    "wind_speed_10m": {
+      "unique_count": 304
+    },
+    "hour": {
+      "unique_count": 24
+    },
+    "day_of_year": {
+      "unique_count": 366
+    }
+  },
+  "outlier_analysis": {
+    "temperature_2m": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 2.05,
+      "upper": 47.25
+    },
+    "relative_humidity_2m": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -15.5,
+      "upper": 140.5
+    },
+    "cloud_cover": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -130.5,
+      "upper": 217.5
+    },
+    "pressure_msl": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 983.45,
+      "upper": 1034.25
+    },
+    "wind_speed_10m": {
+      "method": "IQR",
+      "count": 851,
+      "lower": -2.9,
+      "upper": 18.7
+    },
+    "hour": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -11.5,
+      "upper": 34.5
+    },
+    "day_of_year": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -181.375,
+      "upper": 547.625
+    }
+  },
+  "target_distribution": {
+    "unique_count": 304
+  },
+  "target_numeric_summary": {
+    "count": 26304.0,
+    "mean": 8.404893,
+    "std": 4.529131,
+    "min": 0.0,
+    "25%": 5.2,
+    "50%": 7.6,
+    "75%": 10.6,
+    "max": 36.1
+  },
+  "numeric_target_correlations": {
+    "temperature_2m": 0.262692,
+    "relative_humidity_2m": -0.298337,
+    "cloud_cover": -0.028145,
+    "pressure_msl": -0.181849,
+    "hour": -0.099605,
+    "day_of_year": -0.168062
+  },
+  "potential_leakage_features": [],
+  "potentially_irrelevant_features": [],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

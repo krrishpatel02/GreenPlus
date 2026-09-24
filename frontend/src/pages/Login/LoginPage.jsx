@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useEco } from "../../context/EcoContext";
+import { useAuth } from "../../context/AuthContext";
 import Mascot from "../../componentes/common/Mascot";
 import { motion } from "framer-motion";
 import AnimatedPage from "../../componentes/common/AnimatedPage";
-import { authApi } from "../../services/api";
 import "../Auth/AuthPage.css";
 
 const LoginPage = () => {
   const { setUser } = useEco();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("Eco Champion");
@@ -21,8 +22,8 @@ const LoginPage = () => {
     setError("");
     setLoading(true);
     try {
-      const data = await authApi.login({ email, password });
-      setUser(data.user);
+      const response = await login({ email, password });
+      setUser(response.user);
       navigate("/dashboard");
     } catch (requestError) {
       setError(requestError.message);
@@ -125,6 +126,11 @@ const LoginPage = () => {
             <Link to="/register" className="font-bold text-emerald-600 hover:text-emerald-700 transition">
               Create one now
             </Link>
+            <div className="mt-3">
+              <Link to="/admin/login" className="font-bold text-sky-400 hover:text-sky-300 transition">
+                Admin control room
+              </Link>
+            </div>
           </div>
         </div>
       </div>

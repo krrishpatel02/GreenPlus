@@ -1,0 +1,168 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:10.062335+00:00",
+  "source": "ai\\realtime\\realtime_weather_dataset.csv",
+  "source_sha256": "ddee16999dc3e986dc8b63cd338294e2b55abb21bd5d1265eaa785bb62c95d96",
+  "role": "dataset_candidate",
+  "rows": 26304,
+  "columns": 10,
+  "feature_names": [
+    "time",
+    "temperature_2m",
+    "relative_humidity_2m",
+    "cloud_cover",
+    "wind_speed_10m",
+    "precipitation",
+    "surface_pressure",
+    "shortwave_radiation",
+    "hour",
+    "day_of_year"
+  ],
+  "target_column": "shortwave_radiation",
+  "dtypes": {
+    "time": "str",
+    "temperature_2m": "float64",
+    "relative_humidity_2m": "int64",
+    "cloud_cover": "int64",
+    "wind_speed_10m": "float64",
+    "precipitation": "float64",
+    "surface_pressure": "float64",
+    "shortwave_radiation": "float64",
+    "hour": "int64",
+    "day_of_year": "int64"
+  },
+  "numeric_features": [
+    "temperature_2m",
+    "relative_humidity_2m",
+    "cloud_cover",
+    "wind_speed_10m",
+    "precipitation",
+    "surface_pressure",
+    "shortwave_radiation",
+    "hour",
+    "day_of_year"
+  ],
+  "categorical_features": [
+    "time"
+  ],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "time": {
+      "unique_count": 26304
+    },
+    "temperature_2m": {
+      "unique_count": 426
+    },
+    "relative_humidity_2m": {
+      "unique_count": 97
+    },
+    "cloud_cover": {
+      "unique_count": 101
+    },
+    "wind_speed_10m": {
+      "unique_count": 304
+    },
+    "precipitation": {
+      "unique_count": 108
+    },
+    "surface_pressure": {
+      "unique_count": 328
+    },
+    "shortwave_radiation": {
+      "unique_count": 929
+    },
+    "hour": {
+      "unique_count": 24
+    },
+    "day_of_year": {
+      "unique_count": 366
+    }
+  },
+  "outlier_analysis": {
+    "temperature_2m": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 2.05,
+      "upper": 47.25
+    },
+    "relative_humidity_2m": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -15.5,
+      "upper": 140.5
+    },
+    "cloud_cover": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -130.5,
+      "upper": 217.5
+    },
+    "wind_speed_10m": {
+      "method": "IQR",
+      "count": 851,
+      "lower": -2.9,
+      "upper": 18.7
+    },
+    "precipitation": {
+      "method": "IQR",
+      "count": 2599,
+      "lower": 0.0,
+      "upper": 0.0
+    },
+    "surface_pressure": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 961.6,
+      "upper": 1007.2
+    },
+    "shortwave_radiation": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -615.0,
+      "upper": 1025.0
+    },
+    "hour": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -11.5,
+      "upper": 34.5
+    },
+    "day_of_year": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -181.375,
+      "upper": 547.625
+    }
+  },
+  "target_distribution": {
+    "unique_count": 929
+  },
+  "target_numeric_summary": {
+    "count": 26304.0,
+    "mean": 200.868271,
+    "std": 269.606623,
+    "min": 0.0,
+    "25%": 0.0,
+    "50%": 9.0,
+    "75%": 410.0,
+    "max": 949.0
+  },
+  "numeric_target_correlations": {
+    "temperature_2m": 0.478418,
+    "relative_humidity_2m": -0.47652,
+    "cloud_cover": -0.03295,
+    "wind_speed_10m": 0.255441,
+    "precipitation": -0.045756,
+    "surface_pressure": -0.042679,
+    "hour": -0.445604,
+    "day_of_year": -0.048668
+  },
+  "potential_leakage_features": [],
+  "potentially_irrelevant_features": [],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

@@ -1,8 +1,40 @@
 {
   "datasets": [
     {
+      "name": "realtime_temperature",
+      "source": "ai/temperature/temperature_dataset.csv",
+      "target": "temperature_2m",
+      "model": "temperature_model.joblib",
+      "unit": "degrees Celsius",
+      "live_source": "https://open-meteo.com/"
+    },
+    {
+      "name": "realtime_rainfall",
+      "source": "ai/rainfall/rainfall_dataset.csv",
+      "target": "rain_event",
+      "model": "rainfall_model.joblib",
+      "unit": "rain probability",
+      "live_source": "https://open-meteo.com/"
+    },
+    {
+      "name": "realtime_air_quality",
+      "source": "ai/air_quality/air_quality_dataset.csv",
+      "target": "pm2_5",
+      "model": "air_quality_model.joblib",
+      "unit": "micrograms per cubic meter",
+      "live_source": "https://open-meteo.com/en/docs/air-quality-api"
+    },
+    {
+      "name": "realtime_solar_weather",
+      "source": "ai/realtime/realtime_weather_dataset.csv",
+      "target": "shortwave_radiation",
+      "model": "realtime_solar_model.joblib",
+      "unit": "W/m2, current weather estimate",
+      "live_source": "https://open-meteo.com/"
+    },
+    {
       "name": "carbon_household",
-      "source": "ai/carbon/carbon.csv",
+      "source": "ai/carbon/carbonv3.csv",
       "target": "carbon_emission_kg",
       "model": "carbon_model_v3.joblib",
       "unit": "kg CO2e per month"

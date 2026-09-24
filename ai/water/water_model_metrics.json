@@ -1,0 +1,21 @@
+{
+  "model": "regularized HistGradientBoostingRegressor",
+  "dataset": "Kaggle: prince7489/household-water-consumption-dataset",
+  "rows": 100,
+  "features": [
+    "Bathroom_Liters",
+    "Kitchen_Liters",
+    "Laundry_Liters",
+    "Gardening_Liters"
+  ],
+  "target": "Total_Liters",
+  "train_r2": 0.9881,
+  "test_r2": 0.8639,
+  "test_mae_liters": 26.1122,
+  "test_rmse_liters": 33.817,
+  "cv_r2_mean": 0.8837,
+  "cv_r2_std": 0.0269,
+  "overfit_gap": 0.1241,
+  "fit_diagnosis": "balanced",
+  "validation": "passed"
+}

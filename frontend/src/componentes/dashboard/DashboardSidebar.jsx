@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   ["ai", "🤖", "AI Nudge Assistant"],
   ["research", "📚", "Research Library"],
   ["leaderboard", "🏆", "Leaderboard"],
+  ["help", "❓", "Help Center"],
 ];
 
 const DashboardSidebar = ({ activeTab, setActiveTab, sidebarOpen }) => (

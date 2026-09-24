@@ -1,0 +1,24 @@
+{
+  "model": "HistGradientBoostingRegressor",
+  "dataset": "Open-Meteo historical archive",
+  "rows": 26304,
+  "location": "28.6139, 77.2090",
+  "features": [
+    "temperature_2m",
+    "relative_humidity_2m",
+    "cloud_cover",
+    "pressure_msl",
+    "hour",
+    "day_of_year"
+  ],
+  "target": "wind_speed_10m",
+  "train_r2": 0.4633,
+  "test_r2": -0.6455,
+  "test_mae": 3.253,
+  "test_rmse": 4.0774,
+  "cv_r2_mean": -0.2365,
+  "cv_r2_std": 0.3293,
+  "overfit_gap": 1.1088,
+  "fit_diagnosis": "underfitting",
+  "validation": "rejected"
+}

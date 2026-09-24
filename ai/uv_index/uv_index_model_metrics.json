@@ -1,0 +1,23 @@
+{
+  "model": "HistGradientBoostingRegressor",
+  "dataset": "Open-Meteo recent forecast history",
+  "rows": 70,
+  "location": "28.6139, 77.2090",
+  "features": [
+    "temperature_2m_max",
+    "temperature_2m_min",
+    "precipitation_sum",
+    "wind_speed_10m_max",
+    "day_of_year"
+  ],
+  "target": "uv_index",
+  "train_r2": 0.4773,
+  "test_r2": 0.0083,
+  "test_mae": 0.9308,
+  "test_rmse": 1.3044,
+  "cv_r2_mean": -1.6225,
+  "cv_r2_std": 2.6519,
+  "overfit_gap": 0.469,
+  "fit_diagnosis": "underfitting",
+  "validation": "rejected"
+}

@@ -4,7 +4,8 @@ const useDashboardFilters = ({ schemes, schemeSearch, schemeCategoryFilter, rese
   const filteredSchemes = useMemo(() => {
     const query = schemeSearch.toLowerCase();
     return schemes.filter((scheme) => {
-      const matchesSearch = scheme.title.toLowerCase().includes(query) || scheme.desc.toLowerCase().includes(query);
+      const searchableText = [scheme.title, scheme.desc, scheme.authority, scheme.category, scheme.eligibility].filter(Boolean).join(" ").toLowerCase();
+      const matchesSearch = searchableText.includes(query);
       const matchesCategory = schemeCategoryFilter === "All" || scheme.category === schemeCategoryFilter;
       return matchesSearch && matchesCategory;
     });

@@ -1,0 +1,178 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:09.899207+00:00",
+  "source": "ai\\rainfall\\rainfall_dataset.csv",
+  "source_sha256": "f7e1a532c2d4f86453f01e4766735da299ae572c83d906516d28008e60dc2111",
+  "role": "dataset_candidate",
+  "rows": 26304,
+  "columns": 10,
+  "feature_names": [
+    "time",
+    "temperature_2m",
+    "relative_humidity_2m",
+    "cloud_cover",
+    "wind_speed_10m",
+    "pressure_msl",
+    "precipitation",
+    "hour",
+    "day_of_year",
+    "rain_event"
+  ],
+  "target_column": "rain_event",
+  "dtypes": {
+    "time": "str",
+    "temperature_2m": "float64",
+    "relative_humidity_2m": "int64",
+    "cloud_cover": "int64",
+    "wind_speed_10m": "float64",
+    "pressure_msl": "float64",
+    "precipitation": "float64",
+    "hour": "int64",
+    "day_of_year": "int64",
+    "rain_event": "int64"
+  },
+  "numeric_features": [
+    "temperature_2m",
+    "relative_humidity_2m",
+    "cloud_cover",
+    "wind_speed_10m",
+    "pressure_msl",
+    "precipitation",
+    "hour",
+    "day_of_year",
+    "rain_event"
+  ],
+  "categorical_features": [
+    "time"
+  ],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "time": {
+      "unique_count": 26304
+    },
+    "temperature_2m": {
+      "unique_count": 426
+    },
+    "relative_humidity_2m": {
+      "unique_count": 97
+    },
+    "cloud_cover": {
+      "unique_count": 101
+    },
+    "wind_speed_10m": {
+      "unique_count": 304
+    },
+    "pressure_msl": {
+      "unique_count": 363
+    },
+    "precipitation": {
+      "unique_count": 108
+    },
+    "hour": {
+      "unique_count": 24
+    },
+    "day_of_year": {
+      "unique_count": 366
+    },
+    "rain_event": {
+      "unique_count": 2,
+      "top_values": {
+        "0": 23705,
+        "1": 2599
+      }
+    }
+  },
+  "outlier_analysis": {
+    "temperature_2m": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 2.05,
+      "upper": 47.25
+    },
+    "relative_humidity_2m": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -15.5,
+      "upper": 140.5
+    },
+    "cloud_cover": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -130.5,
+      "upper": 217.5
+    },
+    "wind_speed_10m": {
+      "method": "IQR",
+      "count": 851,
+      "lower": -2.9,
+      "upper": 18.7
+    },
+    "pressure_msl": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 983.45,
+      "upper": 1034.25
+    },
+    "precipitation": {
+      "method": "IQR",
+      "count": 2599,
+      "lower": 0.0,
+      "upper": 0.0
+    },
+    "hour": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -11.5,
+      "upper": 34.5
+    },
+    "day_of_year": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -181.375,
+      "upper": 547.625
+    },
+    "rain_event": {
+      "method": "IQR",
+      "count": 2599,
+      "lower": 0.0,
+      "upper": 0.0
+    }
+  },
+  "target_distribution": {
+    "unique_count": 2,
+    "top_values": {
+      "0": 23705,
+      "1": 2599
+    }
+  },
+  "target_numeric_summary": {
+    "count": 26304.0,
+    "mean": 0.098806,
+    "std": 0.298407,
+    "min": 0.0,
+    "25%": 0.0,
+    "50%": 0.0,
+    "75%": 0.0,
+    "max": 1.0
+  },
+  "numeric_target_correlations": {
+    "temperature_2m": 0.101191,
+    "relative_humidity_2m": 0.272241,
+    "cloud_cover": 0.390548,
+    "wind_speed_10m": 0.045137,
+    "pressure_msl": -0.257351,
+    "precipitation": 0.434511,
+    "hour": -0.077733,
+    "day_of_year": 0.061198
+  },
+  "potential_leakage_features": [
+    "precipitation"
+  ],
+  "potentially_irrelevant_features": [],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

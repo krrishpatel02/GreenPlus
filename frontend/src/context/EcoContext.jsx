@@ -1,57 +1,133 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useMemo, useEffect } from "react";
+import { useEcoProgress } from "./EcoProgressContext";
 
 const EcoContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useEco = () => useContext(EcoContext);
 
 const DEFAULT_SCHEMES = [
   {
-    id: "scheme-1",
-    title: "Residential Solar Rebate Program",
+    id: "india-pm-surya-ghar",
+    title: "PM Surya Ghar: Muft Bijli Yojana",
     category: "Solar",
-    authority: "Federal Energy Dept",
-    reward: "Up to 30% tax credit",
+    authority: "Ministry of New and Renewable Energy (MNRE)",
+    reward: "Central rooftop-solar subsidy; amount depends on system capacity",
     status: "Open",
     difficulty: "Medium",
-    desc: "Get a tax rebate of up to 30% on installations of home solar panels and battery storage equipment.",
+    desc: "India's residential rooftop-solar programme supports eligible households installing grid-connected rooftop systems. Check the current subsidy rules, vendor list, and DISCOM process before applying.",
+    eligibility: "Residential electricity consumers; state and DISCOM conditions apply.",
+    sourceUrl: "https://pmsuryaghar.gov.in/",
     sdgs: ["SDG 7: Clean Energy", "SDG 13: Climate Action"],
   },
   {
-    id: "scheme-2",
-    title: "EV Home Charger Installation Subsidy",
-    category: "Transport",
-    authority: "State Power Grid",
-    reward: "$500 rebate + low EV rates",
+    id: "india-pm-kusum",
+    title: "PM-KUSUM",
+    category: "Agriculture & Solar",
+    authority: "Ministry of New and Renewable Energy (MNRE)",
+    reward: "Support for solar pumps and decentralised renewable power; state share varies",
     status: "Open",
-    difficulty: "Easy",
-    desc: "Subsidize the purchase and installation of level-2 EV smart chargers at your home, plus special overnight electric pricing.",
-    sdgs: ["SDG 11: Sustainable Cities", "SDG 13: Climate Action"],
+    difficulty: "Hard",
+    desc: "PM-KUSUM supports farmers, solar pumps, feeder solarisation, and decentralised solar plants through state implementing agencies.",
+    eligibility: "Farmers and eligible agricultural stakeholders; apply through the state implementing agency.",
+    sourceUrl: "https://pmkusum.mnre.gov.in/",
+    sdgs: ["SDG 2: Zero Hunger", "SDG 7: Clean Energy", "SDG 13: Climate Action"],
   },
   {
-    id: "scheme-3",
-    title: "Smart Thermostat & Heat Pump Incentives",
+    id: "india-ujala",
+    title: "UJALA LED Lighting Programme",
     category: "Energy Efficiency",
-    authority: "Municipal Utilities",
-    reward: "Free device or $150 credit",
-    status: "Open",
+    authority: "Energy Efficiency Services Limited (EESL)",
+    reward: "Affordable energy-efficient LED lighting through programme channels",
+    status: "Ongoing",
     difficulty: "Easy",
-    desc: "Provides cash-back rebates for installing smart learning thermostats or energy-efficient electric heat pumps.",
+    desc: "UJALA promotes efficient LED bulbs and lighting to reduce household electricity consumption. Availability and distribution channels can vary by location.",
+    eligibility: "Households and consumers in participating distribution areas.",
+    sourceUrl: "https://eeslindia.org/en/ujala/",
     sdgs: ["SDG 7: Clean Energy", "SDG 12: Responsible Consumption"],
   },
   {
-    id: "scheme-4",
-    title: "Rainwater Harvesting & Xeriscaping Grant",
+    id: "india-pm-e-drive",
+    title: "PM E-DRIVE Scheme",
+    category: "Transport",
+    authority: "Ministry of Heavy Industries",
+    reward: "Demand incentives for eligible electric vehicles and charging support, subject to scheme rules",
+    status: "Check eligibility",
+    difficulty: "Medium",
+    desc: "PM E-DRIVE supports electric mobility and charging infrastructure. Incentives depend on vehicle type, purchase date, registration, and notified conditions.",
+    eligibility: "Eligible vehicle buyers, manufacturers, and charging ecosystem participants under current guidelines.",
+    sourceUrl: "https://pmedrive.heavyindustries.gov.in/",
+    sdgs: ["SDG 9: Industry and Innovation", "SDG 11: Sustainable Cities", "SDG 13: Climate Action"],
+  },
+  {
+    id: "india-jal-jeevan",
+    title: "Jal Jeevan Mission",
     category: "Water Conservation",
-    authority: "Water Resource Board",
-    reward: "Up to $1,000 reimbursement",
-    status: "Closing Soon",
+    authority: "Department of Drinking Water and Sanitation",
+    reward: "Rural household tap-water infrastructure through state programmes",
+    status: "Ongoing",
+    difficulty: "Medium",
+    desc: "Jal Jeevan Mission works with states and local institutions to improve rural household tap-water supply and source sustainability.",
+    eligibility: "Rural households and local institutions; implementation is coordinated through state and village systems.",
+    sourceUrl: "https://jaljeevanmission.gov.in/",
+    sdgs: ["SDG 6: Clean Water", "SDG 3: Good Health"],
+  },
+  {
+    id: "india-amrut-2",
+    title: "AMRUT 2.0",
+    category: "Water Conservation",
+    authority: "Ministry of Housing and Urban Affairs",
+    reward: "Urban water-supply, sewerage, reuse, and water-body improvement through city projects",
+    status: "Ongoing",
     difficulty: "Hard",
-    desc: "Provides funding for homeowners who convert water-intensive turf lawns to drought-tolerant landscaping or build collection tanks.",
-    sdgs: ["SDG 6: Clean Water", "SDG 15: Life on Land"],
+    desc: "AMRUT 2.0 supports urban water security, reuse, sewerage, and rejuvenation projects through participating urban local bodies.",
+    eligibility: "Residents benefit through participating cities; projects are implemented by urban local bodies.",
+    sourceUrl: "https://mohua.gov.in/",
+    sdgs: ["SDG 6: Clean Water", "SDG 11: Sustainable Cities"],
+  },
+  {
+    id: "india-sbm-urban",
+    title: "Swachh Bharat Mission - Urban 2.0",
+    category: "Waste Management",
+    authority: "Ministry of Housing and Urban Affairs",
+    reward: "City sanitation, source segregation, recycling, and waste-processing services",
+    status: "Ongoing",
+    difficulty: "Medium",
+    desc: "The urban mission supports source segregation, scientific waste processing, sanitation, and garbage-free city initiatives.",
+    eligibility: "Residents, institutions, and urban local bodies in participating cities.",
+    sourceUrl: "https://sbmurban.org/",
+    sdgs: ["SDG 11: Sustainable Cities", "SDG 12: Responsible Consumption"],
+  },
+  {
+    id: "india-gobardhan",
+    title: "GOBARdhan",
+    category: "Waste Management",
+    authority: "Department of Drinking Water and Sanitation",
+    reward: "Support for converting organic waste into biogas, bio-CNG, and compost through local projects",
+    status: "Ongoing",
+    difficulty: "Hard",
+    desc: "GOBARdhan promotes village-level organic waste management and useful products from cattle dung and biodegradable waste.",
+    eligibility: "Local bodies, community groups, entrepreneurs, and eligible project partners.",
+    sourceUrl: "https://sbm.gov.in/GOBARdhan/",
+    sdgs: ["SDG 7: Clean Energy", "SDG 12: Responsible Consumption", "SDG 13: Climate Action"],
+  },
+  {
+    id: "india-green-credit",
+    title: "Green Credit Programme",
+    category: "Climate & Biodiversity",
+    authority: "Ministry of Environment, Forest and Climate Change",
+    reward: "Voluntary green-credit framework for eligible environmental actions",
+    status: "Check eligibility",
+    difficulty: "Hard",
+    desc: "The Green Credit Programme provides a framework for verified environmental actions. Rules, activities, and registration requirements should be checked on the current government portal.",
+    eligibility: "Individuals, organisations, and entities participating in notified activities.",
+    sourceUrl: "https://www.moef.gov.in/",
+    sdgs: ["SDG 13: Climate Action", "SDG 15: Life on Land"],
   },
 ];
 
-const INITIAL_QUIZZES = [
+// eslint-disable-next-line react-refresh/only-export-components
+export const INITIAL_QUIZZES = [
   // --- Module 6 & Rio Trio Education (UNFCCC, CBD, UNCCD) ---
   {
     id: "quiz-rio-climate",
@@ -265,6 +341,8 @@ const INITIAL_QUIZZES = [
 ];
 
 export const EcoProvider = ({ children }) => {
+  const progressContext = useEcoProgress() || {};
+  const { progress, addLog: persistLog, completeQuiz: persistQuiz, updateState: persistState } = progressContext;
   const [user, setUser] = useState({
     name: "Eco Champion",
     level: 1,
@@ -302,49 +380,45 @@ export const EcoProvider = ({ children }) => {
 
   const [completedQuizzes, setCompletedQuizzes] = useState([]);
   const [bookmarkedSchemes, setBookmarkedSchemes] = useState([]);
-  const [badges, setBadges] = useState(["First Step"]);
+  const badges = useMemo(() => {
+    const unlockedBadges = ["First Step"];
+    const unlock = (condition, badge) => {
+      if (condition && !unlockedBadges.includes(badge)) unlockedBadges.push(badge);
+    };
+
+    unlock(energyLogs.some((log) => log.solarEnergy > 10), "Solar Pioneer");
+    unlock(waterLogs.reduce((acc, curr) => acc + curr.waterSaved, 0) >= 150, "Water Wizard");
+    unlock(methaneLogs.reduce((acc, curr) => acc + curr.ch4AvoidedKg, 0) >= 4.0, "Methane Mitigation Master");
+    unlock(
+      completedQuizzes.includes("quiz-rio-climate") &&
+        completedQuizzes.includes("quiz-rio-biodiversity") &&
+        completedQuizzes.includes("quiz-rio-desertification"),
+      "Rio Trio Scholar",
+    );
+    unlock(user.streak >= 5, "Streak Master");
+
+    return unlockedBadges;
+  }, [energyLogs, waterLogs, methaneLogs, completedQuizzes, user.streak]);
   const [levelUpMessage, setLevelUpMessage] = useState(null);
 
-  // Auto unlock research-backed badges based on state
   useEffect(() => {
-    const newBadges = [...badges];
-    let updated = false;
+    if (!progress) return;
+    if (Object.keys(progress.state || {}).length) {
+      // Hydrate the compatibility context from the server-owned progress snapshot.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setUser((current) => ({ ...current, ...progress.state }));
+      if (Array.isArray(progress.state.bookmarkedSchemes)) {
+        setBookmarkedSchemes(progress.state.bookmarkedSchemes);
+      }
+    }
+    if (progress.stats?.completedQuizzes?.length) {
+      setCompletedQuizzes(progress.stats.completedQuizzes);
+    }
+  }, [progress]);
 
-    // Solar Pioneer
-    if (energyLogs.some((log) => log.solarEnergy > 10) && !newBadges.includes("Solar Pioneer")) {
-      newBadges.push("Solar Pioneer");
-      updated = true;
-    }
-    // Water Wizard
-    if (waterLogs.reduce((acc, curr) => acc + curr.waterSaved, 0) >= 150 && !newBadges.includes("Water Wizard")) {
-      newBadges.push("Water Wizard");
-      updated = true;
-    }
-    // Methane Mitigation Master
-    if (methaneLogs.reduce((acc, curr) => acc + curr.ch4AvoidedKg, 0) >= 4.0 && !newBadges.includes("Methane Mitigation Master")) {
-      newBadges.push("Methane Mitigation Master");
-      updated = true;
-    }
-    // Rio Trio Scholar
-    if (
-      completedQuizzes.includes("quiz-rio-climate") &&
-      completedQuizzes.includes("quiz-rio-biodiversity") &&
-      completedQuizzes.includes("quiz-rio-desertification") &&
-      !newBadges.includes("Rio Trio Scholar")
-    ) {
-      newBadges.push("Rio Trio Scholar");
-      updated = true;
-    }
-    // Streak Master
-    if (user.streak >= 5 && !newBadges.includes("Streak Master")) {
-      newBadges.push("Streak Master");
-      updated = true;
-    }
-
-    if (updated) {
-      setBadges(newBadges);
-    }
-  }, [energyLogs, waterLogs, methaneLogs, completedQuizzes, user.streak]);
+  const saveState = (values) => {
+    if (persistState) persistState(values).catch(() => undefined);
+  };
 
   const addXp = (amount) => {
     setUser((prev) => {
@@ -364,12 +438,14 @@ export const EcoProvider = ({ children }) => {
         setLevelUpMessage(`Congratulations! You've reached Level ${newLevel}! Leafy has unlocked new insights for you!`);
       }
 
-      return {
+      const nextUser = {
         ...prev,
         xp: newXp,
         level: newLevel,
         xpToNextLevel: newXpToNext,
       };
+      saveState(nextUser);
+      return nextUser;
     });
   };
 
@@ -381,6 +457,7 @@ export const EcoProvider = ({ children }) => {
       const filtered = prev.filter((log) => log.date !== date);
       return [...filtered, { date, gridEnergy, solarEnergy, offset }];
     });
+    if (persistLog) persistLog("energy", { gridEnergy, solarEnergy, offset }).catch(() => undefined);
 
     setDailyTasks((prev) =>
       prev.map((t) => (t.id === "log_energy" ? { ...t, completed: true } : t))
@@ -401,6 +478,7 @@ export const EcoProvider = ({ children }) => {
       const filtered = prev.filter((log) => log.date !== date);
       return [...filtered, { date, waterUsed, waterSaved }];
     });
+    if (persistLog) persistLog("water", { waterUsed, waterSaved }).catch(() => undefined);
 
     setDailyTasks((prev) =>
       prev.map((t) => (t.id === "log_water" ? { ...t, completed: true } : t))
@@ -426,6 +504,7 @@ export const EcoProvider = ({ children }) => {
       const filtered = prev.filter((log) => log.date !== date);
       return [...filtered, { date, dietChoice, ch4AvoidedKg, compostedKg }];
     });
+    if (persistLog) persistLog("methane", { dietChoice, compostedKg, ch4AvoidedKg }).catch(() => undefined);
 
     setDailyTasks((prev) =>
       prev.map((t) => (t.id === "log_methane" ? { ...t, completed: true } : t))
@@ -439,11 +518,13 @@ export const EcoProvider = ({ children }) => {
     }
   };
 
-  const completeQuiz = (quizId, score) => {
+  const completeQuiz = async (quizId, score, reward = 60) => {
     if (score >= 60) {
       if (!completedQuizzes.includes(quizId)) {
+        const persisted = persistQuiz ? await persistQuiz(quizId, reward).catch(() => null) : { created: true };
+        if (!persisted?.created) return false;
         setCompletedQuizzes((prev) => [...prev, quizId]);
-        addXp(60);
+        addXp(reward);
       }
       
       setDailyTasks((prev) =>
@@ -454,7 +535,9 @@ export const EcoProvider = ({ children }) => {
       if (task && !task.completed) {
         addXp(task.xp);
       }
+      return true;
     }
+    return false;
   };
 
   const claimStreakBonus = () => {
@@ -464,20 +547,22 @@ export const EcoProvider = ({ children }) => {
         streak: prev.streak + 1,
         streakClaimed: true,
       }));
+      saveState({ streak: user.streak + 1, streakClaimed: true });
       addXp(25);
     }
   };
 
   const changeOutfit = (outfit) => {
     setUser((prev) => ({ ...prev, leafyOutfit: outfit }));
+    saveState({ leafyOutfit: outfit });
   };
 
   const toggleBookmarkScheme = (schemeId) => {
-    setBookmarkedSchemes((prev) =>
-      prev.includes(schemeId)
-        ? prev.filter((id) => id !== schemeId)
-        : [...prev, schemeId]
-    );
+    setBookmarkedSchemes((prev) => {
+      const next = prev.includes(schemeId) ? prev.filter((id) => id !== schemeId) : [...prev, schemeId];
+      saveState({ bookmarkedSchemes: next });
+      return next;
+    });
   };
 
   const resetAllData = () => {
@@ -501,7 +586,6 @@ export const EcoProvider = ({ children }) => {
     setMethaneLogs([]);
     setCompletedQuizzes([]);
     setBookmarkedSchemes([]);
-    setBadges(["First Step"]);
   };
 
   return (

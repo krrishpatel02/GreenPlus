@@ -1,0 +1,84 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:10.342732+00:00",
+  "source": "ai\\uv_index\\uv_index_dataset.csv",
+  "source_sha256": "2f3833187af00347b1bc4ed3308b23fb8581ecab9f619b01707b7fe8f8dc2c76",
+  "role": "dataset_candidate",
+  "rows": 0,
+  "columns": 7,
+  "feature_names": [
+    "time",
+    "temperature_2m_max",
+    "temperature_2m_min",
+    "precipitation_sum",
+    "wind_speed_10m_max",
+    "uv_index",
+    "day_of_year"
+  ],
+  "target_column": "uv_index",
+  "dtypes": {
+    "time": "object",
+    "temperature_2m_max": "object",
+    "temperature_2m_min": "object",
+    "precipitation_sum": "object",
+    "wind_speed_10m_max": "object",
+    "uv_index": "object",
+    "day_of_year": "object"
+  },
+  "numeric_features": [],
+  "categorical_features": [
+    "time",
+    "temperature_2m_max",
+    "temperature_2m_min",
+    "precipitation_sum",
+    "wind_speed_10m_max",
+    "uv_index",
+    "day_of_year"
+  ],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "time": {
+      "unique_count": 0,
+      "top_values": {}
+    },
+    "temperature_2m_max": {
+      "unique_count": 0,
+      "top_values": {}
+    },
+    "temperature_2m_min": {
+      "unique_count": 0,
+      "top_values": {}
+    },
+    "precipitation_sum": {
+      "unique_count": 0,
+      "top_values": {}
+    },
+    "wind_speed_10m_max": {
+      "unique_count": 0,
+      "top_values": {}
+    },
+    "uv_index": {
+      "unique_count": 0,
+      "top_values": {}
+    },
+    "day_of_year": {
+      "unique_count": 0,
+      "top_values": {}
+    }
+  },
+  "outlier_analysis": {},
+  "target_distribution": {
+    "unique_count": 0,
+    "top_values": {}
+  },
+  "target_numeric_summary": null,
+  "numeric_target_correlations": {},
+  "potential_leakage_features": [],
+  "potentially_irrelevant_features": [],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

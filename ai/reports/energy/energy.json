@@ -1,0 +1,425 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:09.502245+00:00",
+  "source": "ai\\energy\\energy.csv",
+  "source_sha256": "2820bf712ad0275cb18b85a05250926100d8e65ebb9f4d2d016ca91ea152a25d",
+  "role": "dataset_candidate",
+  "rows": 19735,
+  "columns": 29,
+  "feature_names": [
+    "date",
+    "Appliances",
+    "lights",
+    "T1",
+    "RH_1",
+    "T2",
+    "RH_2",
+    "T3",
+    "RH_3",
+    "T4",
+    "RH_4",
+    "T5",
+    "RH_5",
+    "T6",
+    "RH_6",
+    "T7",
+    "RH_7",
+    "T8",
+    "RH_8",
+    "T9",
+    "RH_9",
+    "T_out",
+    "Press_mm_hg",
+    "RH_out",
+    "Windspeed",
+    "Visibility",
+    "Tdewpoint",
+    "rv1",
+    "rv2"
+  ],
+  "target_column": "Appliances",
+  "dtypes": {
+    "date": "str",
+    "Appliances": "int64",
+    "lights": "int64",
+    "T1": "float64",
+    "RH_1": "float64",
+    "T2": "float64",
+    "RH_2": "float64",
+    "T3": "float64",
+    "RH_3": "float64",
+    "T4": "float64",
+    "RH_4": "float64",
+    "T5": "float64",
+    "RH_5": "float64",
+    "T6": "float64",
+    "RH_6": "float64",
+    "T7": "float64",
+    "RH_7": "float64",
+    "T8": "float64",
+    "RH_8": "float64",
+    "T9": "float64",
+    "RH_9": "float64",
+    "T_out": "float64",
+    "Press_mm_hg": "float64",
+    "RH_out": "float64",
+    "Windspeed": "float64",
+    "Visibility": "float64",
+    "Tdewpoint": "float64",
+    "rv1": "float64",
+    "rv2": "float64"
+  },
+  "numeric_features": [
+    "Appliances",
+    "lights",
+    "T1",
+    "RH_1",
+    "T2",
+    "RH_2",
+    "T3",
+    "RH_3",
+    "T4",
+    "RH_4",
+    "T5",
+    "RH_5",
+    "T6",
+    "RH_6",
+    "T7",
+    "RH_7",
+    "T8",
+    "RH_8",
+    "T9",
+    "RH_9",
+    "T_out",
+    "Press_mm_hg",
+    "RH_out",
+    "Windspeed",
+    "Visibility",
+    "Tdewpoint",
+    "rv1",
+    "rv2"
+  ],
+  "categorical_features": [
+    "date"
+  ],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "date": {
+      "unique_count": 19735
+    },
+    "Appliances": {
+      "unique_count": 92
+    },
+    "lights": {
+      "unique_count": 8,
+      "top_values": {
+        "0": 15252,
+        "10": 2212,
+        "20": 1624,
+        "30": 559,
+        "40": 77,
+        "50": 9,
+        "70": 1,
+        "60": 1
+      }
+    },
+    "T1": {
+      "unique_count": 722
+    },
+    "RH_1": {
+      "unique_count": 2547
+    },
+    "T2": {
+      "unique_count": 1650
+    },
+    "RH_2": {
+      "unique_count": 3376
+    },
+    "T3": {
+      "unique_count": 1426
+    },
+    "RH_3": {
+      "unique_count": 2618
+    },
+    "T4": {
+      "unique_count": 1390
+    },
+    "RH_4": {
+      "unique_count": 2987
+    },
+    "T5": {
+      "unique_count": 2263
+    },
+    "RH_5": {
+      "unique_count": 7571
+    },
+    "T6": {
+      "unique_count": 4446
+    },
+    "RH_6": {
+      "unique_count": 9709
+    },
+    "T7": {
+      "unique_count": 1955
+    },
+    "RH_7": {
+      "unique_count": 5891
+    },
+    "T8": {
+      "unique_count": 2228
+    },
+    "RH_8": {
+      "unique_count": 6649
+    },
+    "T9": {
+      "unique_count": 924
+    },
+    "RH_9": {
+      "unique_count": 3388
+    },
+    "T_out": {
+      "unique_count": 1730
+    },
+    "Press_mm_hg": {
+      "unique_count": 2189
+    },
+    "RH_out": {
+      "unique_count": 566
+    },
+    "Windspeed": {
+      "unique_count": 189
+    },
+    "Visibility": {
+      "unique_count": 413
+    },
+    "Tdewpoint": {
+      "unique_count": 1409
+    },
+    "rv1": {
+      "unique_count": 19735
+    },
+    "rv2": {
+      "unique_count": 19735
+    }
+  },
+  "outlier_analysis": {
+    "Appliances": {
+      "method": "IQR",
+      "count": 2138,
+      "lower": -25.0,
+      "upper": 175.0
+    },
+    "lights": {
+      "method": "IQR",
+      "count": 4483,
+      "lower": 0.0,
+      "upper": 0.0
+    },
+    "T1": {
+      "method": "IQR",
+      "count": 515,
+      "lower": 18.0,
+      "upper": 25.36
+    },
+    "RH_1": {
+      "method": "IQR",
+      "count": 146,
+      "lower": 28.733333,
+      "upper": 51.666667
+    },
+    "T2": {
+      "method": "IQR",
+      "count": 546,
+      "lower": 14.725,
+      "upper": 25.565
+    },
+    "RH_2": {
+      "method": "IQR",
+      "count": 235,
+      "lower": 29.86,
+      "upper": 51.3
+    },
+    "T3": {
+      "method": "IQR",
+      "count": 217,
+      "lower": 17.04,
+      "upper": 27.04
+    },
+    "RH_3": {
+      "method": "IQR",
+      "count": 15,
+      "lower": 29.61,
+      "upper": 49.05
+    },
+    "T4": {
+      "method": "IQR",
+      "count": 186,
+      "lower": 15.675,
+      "upper": 25.955
+    },
+    "RH_4": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 25.59,
+      "upper": 52.096667
+    },
+    "T5": {
+      "method": "IQR",
+      "count": 179,
+      "lower": 14.764286,
+      "upper": 24.132857
+    },
+    "RH_5": {
+      "method": "IQR",
+      "count": 1330,
+      "lower": 33.005,
+      "upper": 66.058333
+    },
+    "T6": {
+      "method": "IQR",
+      "count": 515,
+      "lower": -7.817333,
+      "upper": 22.7
+    },
+    "RH_6": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -49.7775,
+      "upper": 163.029167
+    },
+    "T7": {
+      "method": "IQR",
+      "count": 2,
+      "lower": 14.35,
+      "upper": 25.95
+    },
+    "RH_7": {
+      "method": "IQR",
+      "count": 42,
+      "lower": 20.25,
+      "upper": 50.25
+    },
+    "T8": {
+      "method": "IQR",
+      "count": 71,
+      "lower": 16.89,
+      "upper": 27.29
+    },
+    "RH_8": {
+      "method": "IQR",
+      "count": 17,
+      "lower": 27.862667,
+      "upper": 57.74
+    },
+    "T9": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 14.1,
+      "upper": 24.5
+    },
+    "RH_9": {
+      "method": "IQR",
+      "count": 21,
+      "lower": 29.742857,
+      "upper": 53.095238
+    },
+    "T_out": {
+      "method": "IQR",
+      "count": 436,
+      "lower": -6.445833,
+      "upper": 20.520833
+    },
+    "Press_mm_hg": {
+      "method": "IQR",
+      "count": 219,
+      "lower": 735.933333,
+      "upper": 775.933333
+    },
+    "RH_out": {
+      "method": "IQR",
+      "count": 239,
+      "lower": 38.333333,
+      "upper": 123.666667
+    },
+    "Windspeed": {
+      "method": "IQR",
+      "count": 214,
+      "lower": -3.25,
+      "upper": 10.75
+    },
+    "Visibility": {
+      "method": "IQR",
+      "count": 2522,
+      "lower": 12.5,
+      "upper": 56.5
+    },
+    "Tdewpoint": {
+      "method": "IQR",
+      "count": 10,
+      "lower": -7.6,
+      "upper": 15.066667
+    },
+    "rv1": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -25.130931,
+      "upper": 75.21259
+    },
+    "rv2": {
+      "method": "IQR",
+      "count": 0,
+      "lower": -25.130931,
+      "upper": 75.21259
+    }
+  },
+  "target_distribution": {
+    "unique_count": 92
+  },
+  "target_numeric_summary": {
+    "count": 19735.0,
+    "mean": 97.694958,
+    "std": 102.524891,
+    "min": 10.0,
+    "25%": 50.0,
+    "50%": 60.0,
+    "75%": 100.0,
+    "max": 1080.0
+  },
+  "numeric_target_correlations": {
+    "lights": 0.197278,
+    "T1": 0.055447,
+    "RH_1": 0.086031,
+    "T2": 0.120073,
+    "RH_2": -0.060465,
+    "T3": 0.08506,
+    "RH_3": 0.036292,
+    "T4": 0.040281,
+    "RH_4": 0.016965,
+    "T5": 0.01976,
+    "RH_5": 0.006955,
+    "T6": 0.117638,
+    "RH_6": -0.083178,
+    "T7": 0.025801,
+    "RH_7": -0.055642,
+    "T8": 0.039572,
+    "RH_8": -0.094039,
+    "T9": 0.01001,
+    "RH_9": -0.051462,
+    "T_out": 0.099155,
+    "Press_mm_hg": -0.034885,
+    "RH_out": -0.152282,
+    "Windspeed": 0.087122,
+    "Visibility": 0.00023,
+    "Tdewpoint": 0.015353,
+    "rv1": -0.011145,
+    "rv2": -0.011145
+  },
+  "potential_leakage_features": [],
+  "potentially_irrelevant_features": [],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

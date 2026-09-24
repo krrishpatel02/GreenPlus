@@ -1,0 +1,102 @@
+{
+  "generated_at_utc": "2026-09-14T11:31:09.749979+00:00",
+  "source": "ai\\energy\\energy_v2_model_comparison.csv",
+  "source_sha256": "ac5ed4541f441342f3ea82ae747a186be5f1f0992f078d5e8e2089d5167b2f08",
+  "role": "derived_output",
+  "rows": 4,
+  "columns": 4,
+  "feature_names": [
+    "Unnamed: 0",
+    "MAE",
+    "RMSE",
+    "R2"
+  ],
+  "target_column": null,
+  "dtypes": {
+    "Unnamed: 0": "str",
+    "MAE": "float64",
+    "RMSE": "float64",
+    "R2": "float64"
+  },
+  "numeric_features": [
+    "MAE",
+    "RMSE",
+    "R2"
+  ],
+  "categorical_features": [
+    "Unnamed: 0"
+  ],
+  "missing_values": {},
+  "duplicate_records": 0,
+  "unique_values": {
+    "Unnamed: 0": {
+      "unique_count": 4,
+      "top_values": {
+        "Random Forest": 1,
+        "Gradient Boosting": 1,
+        "Extra Trees": 1,
+        "Hist Gradient Boosting": 1
+      }
+    },
+    "MAE": {
+      "unique_count": 4,
+      "top_values": {
+        "31.68649275978577": 1,
+        "39.59962940029885": 1,
+        "30.36286839794968": 1,
+        "36.69219160130494": 1
+      }
+    },
+    "RMSE": {
+      "unique_count": 4,
+      "top_values": {
+        "65.95591575693923": 1,
+        "87.72373081870705": 1,
+        "63.96865784776782": 1,
+        "72.57315551792108": 1
+      }
+    },
+    "R2": {
+      "unique_count": 4,
+      "top_values": {
+        "0.5652899746343294": 1,
+        "0.2310000102508363": 1,
+        "0.5910910425035799": 1,
+        "0.4736869233704321": 1
+      }
+    }
+  },
+  "outlier_analysis": {
+    "MAE": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 22.26039,
+      "upper": 46.514248
+    },
+    "RMSE": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 49.106554,
+      "upper": 92.713346
+    },
+    "R2": {
+      "method": "IQR",
+      "count": 0,
+      "lower": 0.174928,
+      "upper": 0.809828
+    }
+  },
+  "target_distribution": null,
+  "target_numeric_summary": null,
+  "numeric_target_correlations": {},
+  "potential_leakage_features": [],
+  "potentially_irrelevant_features": [
+    "Unnamed: 0"
+  ],
+  "notes": [
+    "IQR outliers are signals for review, not automatic removal decisions.",
+    "Correlation is descriptive and does not establish causality or safe feature use.",
+    "Known weather targets use the dataset-specific training contract; other targets require exactly one known target column.",
+    "Rainfall precipitation is flagged because rain_event is defined from it and must not be used for leakage-safe prediction."
+  ]
+}

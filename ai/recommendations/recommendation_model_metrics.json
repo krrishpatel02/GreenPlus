@@ -1,0 +1,38 @@
+{
+  "dataset": "Kaggle: sonalshinde123/personal-carbon-footprint-behavior-dataset",
+  "rows": 1400,
+  "features": [
+    "day_type",
+    "transport_mode",
+    "distance_km",
+    "electricity_kwh",
+    "renewable_usage_pct",
+    "food_type",
+    "screen_time_hours",
+    "waste_generated_kg"
+  ],
+  "green_action": {
+    "target": "action_opportunity",
+    "model": "regularized HistGradientBoostingRegressor",
+    "train_r2": 0.9934,
+    "test_r2": 0.9854,
+    "test_mae": 0.0092,
+    "test_rmse": 0.0136,
+    "cv_r2_mean": 0.9843,
+    "cv_r2_std": 0.0032,
+    "overfit_gap": 0.008,
+    "fit_diagnosis": "balanced"
+  },
+  "eco_advice": {
+    "target": "carbon_impact_level",
+    "model": "regularized HistGradientBoostingClassifier",
+    "train_f1_macro": 0.9613,
+    "test_f1_macro": 0.84,
+    "test_accuracy": 0.8714,
+    "cv_f1_macro_mean": 0.871,
+    "cv_f1_macro_std": 0.0313,
+    "overfit_gap": 0.1213,
+    "fit_diagnosis": "balanced"
+  },
+  "validation": "passed"
+}

@@ -1,0 +1,23 @@
+{
+  "model": "HistGradientBoostingRegressor",
+  "dataset": "Open-Meteo Air Quality API",
+  "rows": 2208,
+  "location": "28.6139, 77.2090",
+  "features": [
+    "carbon_monoxide",
+    "nitrogen_dioxide",
+    "ozone",
+    "dust",
+    "hour",
+    "day_of_year"
+  ],
+  "target": "pm2_5",
+  "train_r2": 0.9806,
+  "test_r2": 0.8154,
+  "test_mae": 10.8514,
+  "test_rmse": 13.787,
+  "cv_r2_mean": 0.7291,
+  "cv_r2_std": 0.1116,
+  "overfit_gap": 0.1652,
+  "validation": "passed"
+}
