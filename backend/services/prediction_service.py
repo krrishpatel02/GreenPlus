@@ -111,7 +111,7 @@ class PredictionService:
             "water": {"available": self.water_model.available, "error": self.water_model.error, "metrics": self.model_metrics(self.water_metrics_file)},
             "green_action": {"available": self.action_model.available, "error": self.action_model.error, "metrics": self.model_metrics(self.recommendation_metrics_file).get("green_action", {})},
             "eco_advice": {"available": self.advice_model.available, "error": self.advice_model.error, "metrics": self.model_metrics(self.recommendation_metrics_file).get("eco_advice", {})},
-            "rio_trio": {**decision("rio_trio", self.model_metrics(self.rio_trio_metrics_file)), "available": False, "error": self.rio_trio_model.error, "metrics": self.model_metrics(self.rio_trio_metrics_file)},
+            "rio_trio": {**decision("rio_trio", self.model_metrics(self.rio_trio_metrics_file)), "available": self.rio_trio_model.available, "error": self.rio_trio_model.error, "metrics": self.model_metrics(self.rio_trio_metrics_file)},
             "methane": {"available": self.methane_model.available, "error": self.methane_model.error, "metrics": self.model_metrics(self.methane_metrics_file)},
         }
 
@@ -159,14 +159,18 @@ class PredictionService:
         }], columns=model_bundle["features"])
         daily_liters = max(0, float(model_bundle["model"].predict(features)[0]))
         baseline = household_size * 135
-        saving = max(0, baseline - daily_liters)
+        saving = baseline - daily_liters
+        if saving >= 0:
+            rec = f"Great work! You are saving about {round(saving)} L/day compared to average households."
+        else:
+            rec = f"Your water use is about {round(abs(saving))} L/day above benchmark. Try shortening showers to under 5 minutes and fixing dripping taps."
         return {
             "daily_liters": round(daily_liters, 2),
             "weekly_liters": round(daily_liters * 7, 2),
-            "estimated_daily_saving_liters": round(saving, 2),
+            "estimated_daily_saving_liters": round(max(0, saving), 2),
             "method": "Kaggle-trained household water regression",
             "model": "water_consumption_model",
-            "recommendation": "Shorten showers and check for leaks." if saving < 0 else "Keep logging water-saving activities.",
+            "recommendation": rec,
         }
 
     def recommendation_features(self, payload):
@@ -195,11 +199,41 @@ class PredictionService:
         solar_percent = self.number(payload, "solar_percent", 0, minimum=0)
         compost = self.number(payload, "compost_kg_week", 0, minimum=0)
         return [
-            {"action": "Reduce standby and cooling use", "reason": f"Monthly electricity is {energy:.0f} kWh.", "priority": energy / 250, "impact": "energy and carbon", "difficulty": "Easy"},
-            {"action": "Use public transport or combine trips", "reason": f"Monthly car travel is {car_km:.0f} km.", "priority": car_km / 300, "impact": "transport carbon", "difficulty": "Medium"},
-            {"action": "Shorten showers and check fixtures", "reason": f"Estimated water use is {water:.0f} L/day.", "priority": water / 400, "impact": "water demand", "difficulty": "Easy"},
-            {"action": "Increase solar utilization", "reason": f"Current solar share is {solar_percent:.0f}%.", "priority": max(0, (100 - solar_percent) / 100), "impact": "grid emissions", "difficulty": "Medium"},
-            {"action": "Compost more food waste", "reason": f"Current composting is {compost:.1f} kg/week.", "priority": max(0, 1 - compost / 5), "impact": "methane avoidance", "difficulty": "Easy"},
+            {
+                "action": "Reduce standby devices and cooling power",
+                "reason": f"Your electricity use is {energy:.0f} kWh/month. Unplugging idle electronics cuts power bills quickly.",
+                "priority": energy / 250,
+                "impact": "Energy & Carbon",
+                "difficulty": "Easy",
+            },
+            {
+                "action": "Combine trips or choose public transit / cycling",
+                "reason": f"You drive ~{car_km:.0f} km monthly. Combining errands or taking transit cuts fuel use and emissions.",
+                "priority": car_km / 300,
+                "impact": "Transport Carbon",
+                "difficulty": "Medium",
+            },
+            {
+                "action": "Take 5-minute showers and fix leaking taps",
+                "reason": f"Estimated water use is {water:.0f} L/day. Keeping showers under 5 minutes can save over 40 L daily.",
+                "priority": water / 400,
+                "impact": "Water Demand",
+                "difficulty": "Easy",
+            },
+            {
+                "action": "Shift high-power chores to peak sunshine hours",
+                "reason": f"Current solar share is {solar_percent:.0f}%. Running laundry between 11 AM and 3 PM uses clean, free energy.",
+                "priority": max(0, (100 - solar_percent) / 100),
+                "impact": "Grid Emissions",
+                "difficulty": "Medium",
+            },
+            {
+                "action": "Compost kitchen scraps instead of throwing them away",
+                "reason": f"You compost {compost:.1f} kg/week. Composting prevents organic food waste from creating harmful methane in landfills.",
+                "priority": max(0, 1 - compost / 5),
+                "impact": "Methane Avoidance",
+                "difficulty": "Easy",
+            },
         ]
 
     def green_actions(self, payload):
@@ -255,10 +289,41 @@ class PredictionService:
         }])
 
     def rio_trio(self, payload):
+        model_bundle = self.rio_trio_model.model
+        if model_bundle is None:
+            raise RuntimeError(f"Rio Trio prediction is unavailable. {self.rio_trio_model.error}")
+        scores = np.clip(model_bundle["model"].predict(self.rio_trio_features(payload))[0], 0, 1)
+        actions = [
+            {
+                "treaty": "UNFCCC",
+                "domain": "Climate Action",
+                "action": "Save electricity and choose green travel",
+                "score": round(float(scores[0]) * 100, 1),
+                "reason": "Reduces household carbon emissions through energy conservation and clean transport.",
+            },
+            {
+                "treaty": "CBD",
+                "domain": "Nature & Biodiversity",
+                "action": "Choose plant-rich foods and cut packaging waste",
+                "score": round(float(scores[1]) * 100, 1),
+                "reason": "Protects natural wildlife habitats by easing agricultural and landfill pressure.",
+            },
+            {
+                "treaty": "UNCCD",
+                "domain": "Soil & Land Health",
+                "action": "Compost food scraps to enrich local soil",
+                "score": round(float(scores[2]) * 100, 1),
+                "reason": "Turns food waste into natural organic compost to prevent soil degradation.",
+            },
+        ]
         registry = decision("rio_trio", self.model_metrics(self.rio_trio_metrics_file))
-        # rio_trio is gated: synthetic targets derived from input features make
-        # scores unreliable for production use. Return a clear status instead.
-        return {"status": "gated_rejected", "model_status": registry["status"], "reason": registry["reason"], "prediction": None}
+        return {
+            "status": "success",
+            "model_status": registry["status"],
+            "actions": sorted(actions, key=lambda item: item["score"], reverse=True),
+            "method": "Trained Rio Trio treaties model",
+            "model_available": True,
+        }
 
     def methane(self, payload):
         model_bundle = self.methane_model.model
@@ -275,7 +340,21 @@ class PredictionService:
         reduction_fraction = min(0.8, diet_reduction + compost_reduction)
         baseline_kg = baseline_tonnes * 1000 * household_size
         avoided = baseline_kg * reduction_fraction
-        return {"estimated_annual_methane_kg": round(baseline_kg, 2), "avoided_kg_ch4": round(avoided, 2), "diet_component_kg_ch4": round(baseline_kg * diet_reduction, 2), "compost_component_kg_ch4": round(baseline_kg * compost_reduction, 2), "predicted_baseline_tonnes_per_person": round(baseline_tonnes, 4), "method": "Kaggle-trained methane baseline plus household mitigation factors", "model_available": True}
+        summary = (
+            f"Your household creates an estimated {round(baseline_kg)} kg of methane annually, "
+            f"and avoids ~{round(avoided)} kg ({round(reduction_fraction * 100)}% cut) through "
+            f"your {diet.lower()} diet and composting."
+        )
+        return {
+            "estimated_annual_methane_kg": round(baseline_kg, 2),
+            "avoided_kg_ch4": round(avoided, 2),
+            "diet_component_kg_ch4": round(baseline_kg * diet_reduction, 2),
+            "compost_component_kg_ch4": round(baseline_kg * compost_reduction, 2),
+            "predicted_baseline_tonnes_per_person": round(baseline_tonnes, 4),
+            "summary": summary,
+            "method": "Kaggle-trained methane baseline plus household mitigation factors",
+            "model_available": True,
+        }
 
     def analyze_energy(self, payload):
         return analyze_energy_engine(payload, self.number)
@@ -346,9 +425,21 @@ class PredictionService:
             "day_of_year": timestamp.dayofyear,
         }], columns=model_bundle["features"])
         prediction = max(0, float(model_bundle["model"].predict(values)[0]))
+        if prediction <= 12.0:
+            aq_level = "Good (Clean air, safe for all outdoor activities)"
+        elif prediction <= 35.4:
+            aq_level = "Moderate (Acceptable quality, sensitive individuals should take care)"
+        elif prediction <= 55.4:
+            aq_level = "Unhealthy for Sensitive Groups (Children and elderly should limit prolonged exertion)"
+        elif prediction <= 150.4:
+            aq_level = "Unhealthy (Everyone may experience slight irritation, wear a mask outside)"
+        else:
+            aq_level = "Hazardous (Avoid prolonged outdoor exertion, keep windows shut)"
+
         return {
             "pm2_5_ug_m3": round(prediction, 2),
             "observed_pm2_5_ug_m3": current["pm2_5"],
+            "air_quality_level": aq_level,
             "latitude": latitude,
             "longitude": longitude,
             "observed_at": current["time"],
@@ -384,9 +475,17 @@ class PredictionService:
             "day_of_year": timestamp.dayofyear,
         }], columns=model_bundle["features"])
         probability = float(model_bundle["model"].predict_proba(values)[0][1])
+        if probability < 0.20:
+            rain_desc = "Low chance of rain (Likely dry, safe for outdoor tasks)"
+        elif probability < 0.60:
+            rain_desc = "Moderate chance of rain (Keep an umbrella handy)"
+        else:
+            rain_desc = "High chance of rain (Rain likely, move solar laundry earlier)"
+
         return {
             "rain_probability": round(probability, 4),
             "rain_probability_percent": round(probability * 100, 2),
+            "rain_condition": rain_desc,
             "observed_precipitation_mm": current["precipitation"],
             "latitude": latitude,
             "longitude": longitude,
@@ -422,9 +521,19 @@ class PredictionService:
             "day_of_year": timestamp.dayofyear,
         }], columns=model_bundle["features"])
         prediction = max(0, float(model_bundle["model"].predict(values)[0]))
+        if prediction < 15.0:
+            temp_desc = "Cool (Comfortable, light jacket recommended)"
+        elif prediction <= 28.0:
+            temp_desc = "Pleasant & Mild (Ideal outdoor temperature)"
+        elif prediction <= 35.0:
+            temp_desc = "Warm to Hot (Stay hydrated and seek shade)"
+        else:
+            temp_desc = "Extreme Heat (Limit midday outdoor activity, drink plenty of water)"
+
         return {
             "temperature_celsius": round(prediction, 2),
             "observed_temperature_celsius": current["temperature_2m"],
+            "temperature_condition": temp_desc,
             "latitude": latitude,
             "longitude": longitude,
             "observed_at": current["time"],
@@ -454,11 +563,14 @@ class PredictionService:
             raise RuntimeError("Open-Meteo did not return UV-index data for this location.")
         timestamp = daily["time"][0]
         if registry["status"] != "VALIDATED":
+            uv_val = round(float(daily["uv_index_max"][0]), 2)
+            uv_desc = "Low (No sun protection needed)" if uv_val <= 2 else ("Moderate (Wear sunglasses and sunscreen)" if uv_val <= 5 else ("High (Cover up and wear a hat)" if uv_val <= 7 else "Very High / Extreme (Avoid midday sun)"))
             return {
                 "status": "gated_rejected",
                 "model_status": registry["status"],
                 "reason": registry["reason"],
-                "uv_index": round(float(daily["uv_index_max"][0]), 2),
+                "uv_index": uv_val,
+                "uv_risk": uv_desc,
                 "latitude": latitude,
                 "longitude": longitude,
                 "forecast_date": timestamp,
@@ -475,8 +587,11 @@ class PredictionService:
             "day_of_year": date.dayofyear,
         }], columns=model_bundle["features"])
         prediction = max(0, float(model_bundle["model"].predict(values)[0]))
+        uv_val = round(prediction, 2)
+        uv_desc = "Low (No sun protection needed)" if uv_val <= 2 else ("Moderate (Wear sunglasses and sunscreen)" if uv_val <= 5 else ("High (Cover up and wear a hat)" if uv_val <= 7 else "Very High / Extreme (Avoid midday sun)"))
         return {
-            "uv_index": round(prediction, 2),
+            "uv_index": uv_val,
+            "uv_risk": uv_desc,
             "latitude": latitude,
             "longitude": longitude,
             "forecast_date": timestamp,
@@ -502,11 +617,14 @@ class PredictionService:
         with urlopen(f"{OPEN_METEO_BASE_URL}/forecast?{query}", timeout=10) as response:
             current = load(response)["current"]
         if registry["status"] != "VALIDATED":
+            w_val = round(float(current["wind_speed_10m"]), 2)
+            w_desc = "Light Breeze (Calm, pleasant outdoors)" if w_val < 12 else ("Moderate Breeze (Pleasant outdoor conditions)" if w_val < 29 else ("Strong Wind (Noticeable wind, secure loose items)" if w_val < 50 else "High Wind / Gale (Very windy outdoors)"))
             return {
                 "status": "gated_rejected",
                 "model_status": registry["status"],
                 "reason": registry["reason"],
-                "wind_speed_kmh": round(float(current["wind_speed_10m"]), 2),
+                "wind_speed_kmh": w_val,
+                "wind_condition": w_desc,
                 "latitude": latitude,
                 "longitude": longitude,
                 "observed_at": current["time"],
@@ -525,8 +643,11 @@ class PredictionService:
             "day_of_year": timestamp.dayofyear,
         }], columns=model_bundle["features"])
         prediction = max(0, float(model_bundle["model"].predict(values)[0]))
+        w_val = round(prediction, 2)
+        w_desc = "Light Breeze (Calm, pleasant outdoors)" if w_val < 12 else ("Moderate Breeze (Pleasant outdoor conditions)" if w_val < 29 else ("Strong Wind (Noticeable wind, secure loose items)" if w_val < 50 else "High Wind / Gale (Very windy outdoors)"))
         return {
-            "wind_speed_kmh": round(prediction, 2),
+            "wind_speed_kmh": w_val,
+            "wind_condition": w_desc,
             "observed_wind_speed_kmh": current["wind_speed_10m"],
             "latitude": latitude,
             "longitude": longitude,

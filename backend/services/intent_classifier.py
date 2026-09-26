@@ -25,9 +25,9 @@ def classify_intent(text, previous_intent=None):
     entities = {
         "date": "tomorrow" if _has(value, "tomorrow", "kal", "કાલે") else ("today" if _has(value, "today", "aaj", "આજે") else None),
         "activity": "washing_machine" if _has(value, "washing machine", "laundry", "કપડાં", "વોશિંગ") else None,
-        "ev": _has(value, "ev", "electric car", "ગાડી charge", "कार charge"),
+        "ev": _has(value, "ev", "electric car", "electric vehicle", "ગાડી charge", "कार charge"),
         "solar": _has(value, "solar", "સોલાર", "सोलर"),
-        "weather_condition": "rain" if _has(value, "rain", "barish", "વરસાદ", "बारिश") else None,
+        "weather_condition": "rain" if _has(value, "rain", "barish", "વરસાદ", "बारish") else None,
         "requested_calculation": _has(value, "how much", "kitna", "કેટલું", "કેટલું", "कितना", "calculate", "calculation"),
     }
 
@@ -54,14 +54,14 @@ def classify_intent(text, previous_intent=None):
         intent = "EXPLANATION"
     elif _has(value, "notification", "notifications", "નોટિફિકેશન"):
         intent = "NOTIFICATION_QUERY"
-    elif _has(value, "air quality", "pollution", "હવા", "वायु"):
-        intent = "AIR_QUALITY"
     elif _has(value, "temperature", "hot", "ગરમી", "गर्मी"):
         intent = "TEMPERATURE"
-    elif entities["ev"] and _has(value, "charge", "charging", "ચાર્જ", "चार्ज"):
+    elif _has(value, "air quality", "pollution", "હવા", "वायु"):
+        intent = "AIR_QUALITY"
+    elif entities["ev"]:
         intent = "EV_CHARGING"
-    elif entities["activity"] and (_has(value, "when", "ક્યારે", "kab", "तो") or entities["solar"]):
-        intent = "SOLAR_USAGE_WINDOW" if entities["solar"] or entities["weather_condition"] else "ENERGY_ADVICE"
+    elif entities["activity"] and (_has(value, "when", "ક્યારે", "kab", "તો", "time", "best") or entities["solar"]):
+        intent = "SOLAR_USAGE_WINDOW"
     elif _has(value, "solar", "સોલાર", "सोलर", "ધૂપ", "धूप"):
         intent = "SOLAR_QUESTION"
     elif _has(value, "electricity", "electric", "energy", "bill", "વીજળી", "बिजली"):
