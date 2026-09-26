@@ -1,0 +1,66 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\DELL\OneDrive\Desktop\GreenPlus\.venv1\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\DELL\OneDrive\Desktop\GreenPlus
+collecting ... collected 51 items
+
+backend/tests/test_assistant_notifications.py::test_multilingual_intents PASSED [  1%]
+backend/tests/test_assistant_notifications.py::test_assistant_uses_previous_intent_for_follow_up PASSED [  3%]
+backend/tests/test_assistant_notifications.py::test_notifications_are_personalized_and_deduplicated PASSED [  5%]
+backend/tests/test_auth_security.py::test_register_and_login_flow PASSED [  7%]
+backend/tests/test_auth_security.py::test_profile_requires_auth PASSED   [  9%]
+backend/tests/test_auth_security.py::test_default_admin_is_bootstrapped PASSED [ 11%]
+backend/tests/test_auth_security.py::test_admin_requires_admin_role PASSED [ 13%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[hello-GENERAL_ADVICE] PASSED [ 15%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[what is the weather today?-WEATHER_QUESTION] PASSED [ 17%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[kal rain hai?-RAIN_QUESTION] PASSED [ 19%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[solar available che?-SOLAR_QUESTION] PASSED [ 21%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[best solar usage window?-SOLAR_USAGE_WINDOW] PASSED [ 23%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[When should I charge my EV?-EV_CHARGING] PASSED [ 25%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[give energy advice-ENERGY_ADVICE] PASSED [ 27%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[calculate electricity usage-ENERGY_CALCULATION] PASSED [ 29%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[how can I save water?-WATER_ADVICE] PASSED [ 31%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[paani kitna calculate karo-WATER_CALCULATION] PASSED [ 33%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[how do I reduce waste?-WASTE_ADVICE] PASSED [ 35%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[how do I recycle plastic?-RECYCLING_ADVICE] PASSED [ 37%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[best transport option for commute-TRANSPORT_ADVICE] PASSED [ 39%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[food and diet advice-FOOD_ADVICE] PASSED [ 41%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[climate advice please-CLIMATE_ADVICE] PASSED [ 43%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[check air quality-AIR_QUALITY] PASSED [ 45%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[is it hot today?-TEMPERATURE] PASSED [ 47%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[what is the UV index?-UV] PASSED [ 49%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[is the wind strong?-WIND] PASSED [ 50%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[show my carbon footprint-CARBON_FOOTPRINT] PASSED [ 52%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[calculate my carbon emissions-CARBON_CALCULATION] PASSED [ 54%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[compare solar versus grid-COMPARISON] PASSED [ 56%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[what should I do today?-PERSONAL_ACTION] PASSED [ 58%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[show my notifications-NOTIFICATION_QUERY] PASSED [ 60%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[give me an eco tip-ECO_TIP] PASSED [ 62%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[predict tomorrow's rainfall-PREDICTION] PASSED [ 64%]
+backend/tests/test_nlu_matrix.py::test_all_declared_intents_have_classification_paths[explain composting-EXPLANATION] PASSED [ 66%]
+backend/tests/test_nlu_matrix.py::test_language_detection_covers_required_modes[\u0a9a\u0abe\u0ab2\u0acb \u0aaa\u0abe\u0aa3\u0ac0 \u0aac\u0a9a\u0abe\u0ab5\u0ac0\u0a8f-Gujarati] PASSED [ 68%]
+backend/tests/test_nlu_matrix.py::test_language_detection_covers_required_modes[\u0aae\u0abe\u0ab0\u0ac7 washing machine \u0a95\u0acd\u0aaf\u0abe\u0ab0\u0ac7 \u0a9a\u0ab2\u0abe\u0ab5\u0ac1\u0a82?-Gujlish] PASSED [ 70%]
+backend/tests/test_nlu_matrix.py::test_language_detection_covers_required_modes[\u092c\u093e\u0930\u093f\u0936 \u0915\u092c \u0939\u094b\u0917\u0940-Hindi] PASSED [ 72%]
+backend/tests/test_nlu_matrix.py::test_language_detection_covers_required_modes[kal washing machine kab chalau-Hinglish] PASSED [ 74%]
+backend/tests/test_nlu_matrix.py::test_language_detection_covers_required_modes[When should I run laundry?-English] PASSED [ 76%]
+backend/tests/test_nlu_matrix.py::test_language_detection_covers_required_modes[\u0a95\u0abe\u0ab2\u0ac7 rain \u0a86\u0ab5\u0ab6\u0ac7-Gujlish] PASSED [ 78%]
+backend/tests/test_nlu_matrix.py::test_follow_up_preserves_context_and_applies_natural_answer_rule PASSED [ 80%]
+backend/tests/test_nlu_multilingual.py::test_required_language_detection_variants PASSED [ 82%]
+backend/tests/test_nlu_multilingual.py::test_required_intents_across_scripts PASSED [ 84%]
+backend/tests/test_nlu_multilingual.py::test_mixed_script_follow_up_keeps_conversation_context PASSED [ 86%]
+backend/tests/test_nlu_multilingual.py::test_natural_answer_rule_omits_forecast_number_unless_requested PASSED [ 88%]
+backend/tests/test_prediction_service.py::test_weather_predictions_supply_all_model_features[temperature-features0] PASSED [ 90%]
+backend/tests/test_prediction_service.py::test_weather_predictions_supply_all_model_features[wind-features1] PASSED [ 92%]
+backend/tests/test_prediction_service.py::test_weather_predictions_reject_invalid_coordinates_before_network[payload0] PASSED [ 94%]
+backend/tests/test_prediction_service.py::test_weather_predictions_reject_invalid_coordinates_before_network[payload1] PASSED [ 96%]
+backend/tests/test_progress_persistence.py::test_quiz_completion_is_idempotent_and_user_scoped PASSED [ 98%]
+backend/tests/test_system_health.py::test_health_and_ready_endpoints PASSED [100%]
+
+============================== warnings summary ===============================
+backend/tests/test_prediction_service.py: 1530 warnings
+  C:\Users\DELL\OneDrive\Desktop\GreenPlus\.venv1\Lib\site-packages\joblib\numpy_pickle.py:207: DeprecationWarning: Setting the shape on a NumPy array has been deprecated in NumPy 2.5.
+  As an alternative, you can create a new view using np.reshape (with copy=False if needed).
+    array.shape = self.shape
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+===================== 51 passed, 1530 warnings in 14.24s ======================

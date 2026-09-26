@@ -50,8 +50,8 @@ class NotificationService:
     def update_preferences(self, user_id, values):
         return self.notifications.update_preferences(user_id, values)
 
-    def generate(self, user_id, context):
-        now = datetime.now(timezone.utc)
+    def generate(self, user_id, context, _now=None):
+        now = _now or datetime.now(timezone.utc)
         preferences = {**self.notifications.get_preferences(user_id), **(context.get("preferences") or {})}
         if preferences.get("enabled", True) is False:
             return {"created": False, "reason": "notifications_disabled"}
@@ -66,7 +66,7 @@ class NotificationService:
         categories = preferences.get("categories") or []
         if categories and event["type"] not in categories:
             return {"created": False, "reason": "category_disabled"}
-        if event["type"] in {"EV_CHARGING_RECOMMENDATION", "SOLAR_WINDOW_AVAILABLE"} and not user_context.get("solarAvailable") and event["type"] == "SOLAR_WINDOW_AVAILABLE":
+        if event["type"] == "SOLAR_WINDOW_AVAILABLE" and not user_context.get("solarAvailable"):
             return {"created": False, "reason": "missing_solar_context"}
         event_hash = self._event_hash(event["type"], event["metadata"])
         if self.notifications.recent_event(user_id, event_hash, now - timedelta(minutes=self.COOLDOWN_MINUTES)):

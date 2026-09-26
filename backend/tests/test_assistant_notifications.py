@@ -1,4 +1,6 @@
 import os
+from datetime import datetime, timezone
+from unittest.mock import patch
 
 os.environ["APP_ENV"] = "test"
 os.environ["MONGO_DB_NAME"] = "greenplus_assistant_test"
@@ -6,6 +8,9 @@ os.environ["MONGO_DB_NAME"] = "greenplus_assistant_test"
 from backend.app import create_app
 from backend.database import client as db_client
 from backend.services.intent_classifier import classify_intent
+
+# Fixed daytime UTC time used to prevent quiet-hours blocking the notification test.
+_DAYTIME_UTC = datetime(2026, 9, 26, 14, 0, 0, tzinfo=timezone.utc)
 
 
 def setup_function():
@@ -41,8 +46,13 @@ def test_notifications_are_personalized_and_deduplicated():
         token = register.get_json()["data"]["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
         payload = {"weather": {"rainProbability": 78}, "userContext": {"solarAvailable": True, "solarActivities": True}}
-        first = client.post("/api/notifications/generate", json=payload, headers=headers).get_json()["data"]
-        second = client.post("/api/notifications/generate", json=payload, headers=headers).get_json()["data"]
+        # Patch datetime.now in the notification service so the fixed daytime hour
+        # (14:00 UTC) is used instead of the real clock, preventing quiet-hours blocks.
+        with patch("backend.services.notification_service.datetime") as mock_dt:
+            mock_dt.now.return_value = _DAYTIME_UTC
+            mock_dt.side_effect = lambda *args, **kw: datetime(*args, **kw)
+            first = client.post("/api/notifications/generate", json=payload, headers=headers).get_json()["data"]
+            second = client.post("/api/notifications/generate", json=payload, headers=headers).get_json()["data"]
         assert first["created"] is True
         assert first["notification"]["type"] == "RAIN_EXPECTED"
         assert second == {"created": False, "reason": "cooldown"}

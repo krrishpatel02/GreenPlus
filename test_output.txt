@@ -1,0 +1,6 @@
+﻿============================= test session starts =============================
+collecting ... collected 4 items
+
+backend/tests/test_prediction_service.py::test_weather_predictions_supply_all_model_features[temperature-features0] PASSED [ 25%]
+backend/tests/test_prediction_service.py::test_weather_predictions_supply_all_model_features[wind-features1] PASSED [ 50%]
+backend/tests/test_prediction_service.py::test_weather_predictions_reject_invalid_coordinates_before_network[payload0] 

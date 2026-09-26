@@ -19,7 +19,7 @@ def analyze(payload, number):
     return _energy_analysis(
         appliances=payload["appliances"],
         solar_kwh=number(payload, "solar_kwh", 0, minimum=0),
-        household_size=number(payload, "household_size", integer=True, minimum=1),
+        household_size=number(payload, "household_size", 3, integer=True, minimum=1),
         home_area_sqft=number(payload, "home_area_sqft", minimum=1),
         tariff_id=payload.get("tariff_id", "demo_residential"),
         emission_factor=number(payload, "emission_factor", 0.7, minimum=0),

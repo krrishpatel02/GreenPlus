@@ -30,7 +30,7 @@ class LazyModel:
         try:
             self._model = joblib.load(self.path)
         except Exception as exc:
-            self._error = f"Model could not be loaded: {type(exc).__name__}"
+            self._error = f"Model could not be loaded: {type(exc).__name__}: {exc}"
 
     @property
     def available(self):

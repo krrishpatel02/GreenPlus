@@ -256,18 +256,9 @@ class PredictionService:
 
     def rio_trio(self, payload):
         registry = decision("rio_trio", self.model_metrics(self.rio_trio_metrics_file))
+        # rio_trio is gated: synthetic targets derived from input features make
+        # scores unreliable for production use. Return a clear status instead.
         return {"status": "gated_rejected", "model_status": registry["status"], "reason": registry["reason"], "prediction": None}
-
-        model_bundle = self.rio_trio_model.model
-        if model_bundle is None:
-            raise RuntimeError(f"Rio Trio prediction is unavailable. {self.rio_trio_model.error}")
-        scores = np.clip(model_bundle["model"].predict(self.rio_trio_features(payload))[0], 0, 1)
-        actions = [
-            {"treaty": "UNFCCC", "domain": "Climate action", "action": "Reduce electricity and transport emissions", "score": round(float(scores[0]) * 100, 1), "reason": "Prioritizes energy efficiency, renewable power, and lower-carbon travel."},
-            {"treaty": "CBD", "domain": "Biodiversity protection", "action": "Choose lower-impact food and reduce waste", "score": round(float(scores[1]) * 100, 1), "reason": "Reduces pressure on habitats from food production and discarded materials."},
-            {"treaty": "UNCCD", "domain": "Land protection", "action": "Compost organic waste and protect soil", "score": round(float(scores[2]) * 100, 1), "reason": "Keeps organic matter in productive soil systems and reduces land degradation."},
-        ]
-        return {"actions": sorted(actions, key=lambda item: item["score"], reverse=True), "method": "Kaggle-trained treaty opportunity model", "model_available": True}
 
     def methane(self, payload):
         model_bundle = self.methane_model.model
